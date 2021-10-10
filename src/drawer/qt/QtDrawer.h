@@ -21,6 +21,8 @@ namespace CGCP::drawer {
         virtual ~QtDrawer() override = default;
 
     private:
+        QVector3D render(QVector2D const &p, QMatrix4x4 const &cam);
+
         QGraphicsScene *scene_;
 
         QVector3D scale_{1, 1, 1};

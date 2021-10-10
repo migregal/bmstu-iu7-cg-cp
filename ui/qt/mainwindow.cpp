@@ -22,9 +22,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     _scene->setSceneRect(0, 0, rcontent.width(), rcontent.height());
 
     engine_ = std::make_unique<CGCP::QtEngine>(_scene);
-
-    auto fractal = std::make_shared<CGCP::fractal::Fractal>(engine_->fractal().get("mandelbulb"));
-    engine_->drawer().get("main").setFractal(fractal);
 }
 
 MainWindow::~MainWindow() {
@@ -35,7 +32,10 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     QWidget::mouseDoubleClickEvent(event);
 }
 
-void MainWindow::update_scene() {}
+void MainWindow::update_scene() {
+    auto fractal = std::make_shared<CGCP::fractal::Fractal>(engine_->fractal().get("mandelbulb"));
+    engine_->drawer().get("main").setFractal(fractal);
+}
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
