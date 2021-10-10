@@ -1,11 +1,11 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 
-namespace CGCP
-{
-    template <class T>
+namespace CGCP {
+    template<class T>
     class Solution {
         using tptr = std::unique_ptr<T>;
         using creator = std::function<tptr(void)>;
@@ -29,4 +29,4 @@ namespace CGCP
 
         virtual ~Solution() = default;
     };
-} // namespace CGCP
+}// namespace CGCP

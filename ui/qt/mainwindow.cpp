@@ -6,6 +6,7 @@
 #include <QMessageBox>
 
 #include <engine/qt/QtEngine.h>
+#include <fractals/mandelbulb/Mandelbulb.h>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow) {
@@ -22,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     engine_ = std::make_unique<CGCP::QtEngine>(_scene);
 
-    engine_->drawer().get("main").setFractal({});
+    auto fractal = std::make_shared<CGCP::fractal::Fractal>(engine_->fractal().get("mandelbulb"));
+    engine_->drawer().get("main").setFractal(fractal);
 }
 
 MainWindow::~MainWindow() {

@@ -20,6 +20,7 @@ set(QT_GUI
 
 set(ENGINE
         src/engine/Engine.h
+        src/engine/Engine.cpp
 
         src/engine/qt/QtEngine.h
         src/engine/qt/QtEngine.cpp
@@ -32,10 +33,19 @@ set(DRAWER
         src/drawer/qt/QtDrawer.cpp
         )      
 
+set(FRACTALS
+        src/fractals/Fractal.h
+        
+        src/fractals/mandelbulb/Mandelbulb.h
+        src/fractals/mandelbulb/Mandelbulb.cpp
+        )      
+
+
 add_executable(${PROJECT_NAME}
         ${QT_GUI}
         ${ENGINE}
         ${DRAWER}
+        ${FRACTALS}
         main.cpp
         )
         
