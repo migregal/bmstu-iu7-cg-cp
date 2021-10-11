@@ -18,9 +18,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    auto rcontent = ui->graphicsView->contentsRect();
-    _scene->setSceneRect(0, 0, rcontent.width(), rcontent.height());
-
     engine_ = std::make_unique<CGCP::QtEngine>(_scene);
 }
 
