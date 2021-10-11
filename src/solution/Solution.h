@@ -7,7 +7,7 @@
 namespace CGCP {
     template<class T>
     class Solution {
-        using tptr = std::unique_ptr<T>;
+        using tptr = std::shared_ptr<T>;
         using creator = std::function<tptr(void)>;
 
     private:
@@ -20,11 +20,11 @@ namespace CGCP {
             return *this;
         };
 
-        T &get(std::string key) {
+        std::shared_ptr<T> get(std::string key) {
             if (items_.count(key) == 0)
                 items_[key] = creators_[key]();
 
-            return *items_[key];
+            return items_[key];
         };
 
         virtual ~Solution() = default;

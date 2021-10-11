@@ -33,8 +33,8 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 }
 
 void MainWindow::update_scene() {
-    auto fractal = std::make_shared<CGCP::fractal::Fractal>(engine_->fractal().get("mandelbulb"));
-    engine_->drawer().get("main").setFractal(fractal);
+    auto fractal = engine_->fractal().get("mandelbulb");
+    engine_->drawer().get("main")->setFractal(fractal);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
