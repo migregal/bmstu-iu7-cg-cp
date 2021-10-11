@@ -8,12 +8,9 @@
 namespace CGCP::fractal {
     class Mandelbulb : public Fractal {
     public:
-        Mandelbulb();
+        Mandelbulb() = default;
 
         virtual float map(QVector3D p, QVector4D &resColor) override;
-
-        const Points &points() const override;
-        Points &points() override;
 
         ~Mandelbulb() override = default;
     };

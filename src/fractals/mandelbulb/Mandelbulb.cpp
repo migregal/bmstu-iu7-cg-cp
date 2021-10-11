@@ -1,16 +1,6 @@
 #include <fractals/mandelbulb/Mandelbulb.h>
 
 namespace CGCP::fractal {
-    Mandelbulb::Mandelbulb() : Fractal() {}
-
-    const Points &Mandelbulb::points() const {
-        return Fractal::points();
-    }
-
-    Points &Mandelbulb::points() {
-        return Fractal::points();
-    }
-
     float Mandelbulb::map(QVector3D p, QVector4D &resColor) {
         QVector3D w = p;
         float m = QVector3D::dotProduct(w, w);
