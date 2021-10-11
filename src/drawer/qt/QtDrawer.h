@@ -33,14 +33,7 @@ namespace CGCP::drawer {
         QMatrix4x4 projective_;
 
         void drawFractal();
+
         QPointF transform(const math::Vec3Df &p);
-
-        QVector2D isphere(QVector4D const &sph, QVector3D const &ro, QVector3D const &rd);
-
-        float raycast(QVector3D const &ro, QVector3D const &rd, QVector4D &rescol, float px);
-
-        QVector3D calcNormal(QVector3D &pos, float t, float px);
-
-        float softshadow(QVector3D const &ro, QVector3D const &rd, float k);
     };
 }// namespace CGCP::drawer

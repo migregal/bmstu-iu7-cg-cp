@@ -17,7 +17,11 @@ namespace CGCP::fractal {
     public:
         Fractal() = default;
 
-        virtual float map(QVector3D p, QVector4D &resColor) = 0;
+        virtual float raycast(QVector3D const &ro, QVector3D const &rd, QVector4D &rescol, float px) = 0;
+
+        virtual QVector3D calcNormal(QVector3D &pos, float t, float px) = 0;
+
+        virtual float softshadow(QVector3D const &ro, QVector3D const &rd, float k) = 0;
 
         virtual ~Fractal() = default;
     };

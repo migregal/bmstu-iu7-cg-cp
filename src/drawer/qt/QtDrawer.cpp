@@ -27,45 +27,6 @@ namespace CGCP::drawer {
         drawFractal();
     };
 
-    QVector2D QtDrawer::isphere(QVector4D const &sph, QVector3D const &ro, QVector3D const &rd) {
-        auto oc = ro - QVector3D(sph.x(), sph.y(), sph.z());
-        float b = QVector3D::dotProduct(oc, rd);
-        float c = QVector3D::dotProduct(oc, oc) - sph.w() * sph.w();
-        float h = b * b - c;
-        if (h < 0.0) return QVector2D(-1.0, 0);
-        h = sqrt(h);
-        return QVector2D(-h - b, h - b);
-    }
-
-    float QtDrawer::raycast(QVector3D const &ro, QVector3D const &rd, QVector4D &rescol, float px) {
-        float res = -1.0;
-
-        // bounding sphere
-        auto dis = isphere(QVector4D(0.0, 0.0, 0.0, 1.25), ro, rd);
-        if (dis.y() < 0.0) return -1.0;
-        dis.setX(std::max(dis.x(), 0.0f));
-        dis.setY(std::min(dis.y(), 10.0f));
-
-        // raymarch fractal distance field
-        QVector4D trap;
-
-        float t = dis.x();
-        for (int i = 0; i < 128; i++) {
-            auto pos = ro + rd * t;
-            float th = 0.25 * px * t;
-            float h = fractal_->map(pos, trap);
-            if (t > dis.y() || h < th) break;
-            t += h;
-        }
-
-        if (t < dis.y()) {
-            rescol = trap;
-            res = t;
-        }
-
-        return res;
-    }
-
     static inline QVector3D mix(QVector3D const &x, QVector3D const &y, float a) {
         return x * (1 - a) + y * a;
     }
@@ -77,34 +38,8 @@ namespace CGCP::drawer {
         // return (k > 0.0) ? v : v - 2.0 * n * k;
     }
 
-    QVector3D QtDrawer::calcNormal(QVector3D &pos, float t, float px) {
-        QVector4D tmp;
-        auto e = QVector2D(1.0, -1.0) * 0.5773 * 0.25 * px;
-        auto e1 = QVector3D(e.x(), e.y(), e.y()), e2 = QVector3D(e.y(), e.y(), e.x()),
-             e3 = QVector3D(e.y(), e.x(), e.y()), e4 = QVector3D(e.x(), e.x(), e.x());
-        return QVector3D(
-                       e1 * fractal_->map(pos + e1, tmp) +
-                       e2 * fractal_->map(pos + e2, tmp) +
-                       e3 * fractal_->map(pos + e3, tmp) +
-                       e4 * fractal_->map(pos + e4, tmp))
-                .normalized();
-    }
-
     static inline QVector3D reflect(QVector3D I, QVector3D N) {
         return I - 2.0 * QVector3D::dotProduct(N, I) * N;
-    }
-
-    float QtDrawer::softshadow(QVector3D const &ro, QVector3D const &rd, float k) {
-        float res = 1.0;
-        float t = 0.0;
-        for (int i = 0; i < 64; i++) {
-            QVector4D kk;
-            float h = fractal_->map(ro + rd * t, kk);
-            res = std::min(res, k * h / t);
-            if (res < 0.001) break;
-            t += std::clamp(h, 0.01f, 0.2f);
-        }
-        return std::clamp(res, 0.0f, 1.0f);
     }
 
     QVector3D QtDrawer::render(QVector2D const &p, QMatrix4x4 const &cam) {
@@ -117,7 +52,7 @@ namespace CGCP::drawer {
         auto rd = (QVector3D(cam * QVector4D(sp.x(), sp.y(), fle, 0.0))).normalized();
 
         QVector4D tra;
-        float t = raycast(ro, rd, tra, px);
+        float t = fractal_->raycast(ro, rd, tra, px);
 
         QVector3D color;
 
@@ -132,7 +67,7 @@ namespace CGCP::drawer {
             color *= 0.5;
 
             auto pos = ro + t * rd;
-            auto nor = calcNormal(pos, t, px);
+            auto nor = fractal_->calcNormal(pos, t, px);
 
             nor = refVector(nor, -rd);
 
@@ -142,7 +77,7 @@ namespace CGCP::drawer {
             float fac = std::clamp(1.0 + QVector3D::dotProduct(rd, nor), 0.0, 1.0);
 
             // sun
-            float sha1 = softshadow(pos + 0.001 * nor, light1, 32.0);
+            float sha1 = fractal_->softshadow(pos + 0.001 * nor, light1, 32.0);
             float dif1 = std::clamp(QVector3D::dotProduct(light1, nor), 0.0f, 1.0f) * sha1;
             float spe1 = std::pow(std::clamp(QVector3D::dotProduct(nor, hal), 0.0f, 1.0f), 32.0) * dif1 * (0.04 + 0.96 * std::pow(std::clamp(1.0f - QVector3D::dotProduct(hal, light1), 0.0f, 1.0f), 5.0));
             // bounce
