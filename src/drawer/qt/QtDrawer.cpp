@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 
 #include <QDebug>
 
@@ -73,7 +74,7 @@ namespace CGCP::drawer {
 
             auto hal = (light1 - rd).normalized();
             auto ref = reflect(rd, nor);
-            float occ = std::clamp(0.05 * log(tra.x()), 0.0, 1.0);
+            float occ = std::clamp(0.05 * std::log(tra.x()), 0.0, 1.0);
             float fac = std::clamp(1.0 + QVector3D::dotProduct(rd, nor), 0.0, 1.0);
 
             // sun

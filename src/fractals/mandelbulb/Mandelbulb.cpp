@@ -1,5 +1,7 @@
 #include <fractals/mandelbulb/Mandelbulb.h>
 
+#include <cmath>
+
 namespace CGCP::fractal {
 
     float Mandelbulb::raycast(QVector3D const &ro, QVector3D const &rd, QVector4D &rescol, float px) {

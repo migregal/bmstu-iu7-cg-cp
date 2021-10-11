@@ -6,6 +6,7 @@
 #include <math/Ellipse3D.h>
 #include <math/Vec3D.h>
 
+#include <QVector2D>
 #include <QVector3D>
 #include <QVector4D>
 
