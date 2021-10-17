@@ -19,26 +19,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     engine_ = std::make_unique<CGCP::QtEngine>(_scene);
+
+    connect(ui->applyButton, &QPushButton::clicked, this,
+            &MainWindow::on_apply_clicked);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
-    QWidget::mouseDoubleClickEvent(event);
+void MainWindow::on_apply_clicked() {
+    update_scene();
 }
 
 void MainWindow::update_scene() {
-    auto fractal = engine_->fractal().get("mandelbulb");
-    engine_->drawer().get("main")->setFractal(fractal);
-}
-
-void MainWindow::resizeEvent(QResizeEvent *event) {
-    QWidget::resizeEvent(event);
-
     auto rcontent = ui->graphicsView->contentsRect();
     _scene->setSceneRect(0, 0, rcontent.width(), rcontent.height());
 
-    update_scene();
+    auto fractal = engine_->fractal().get("mandelbulb");
+    engine_->drawer().get("main")->setFractal(fractal);
 }

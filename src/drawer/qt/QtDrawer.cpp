@@ -34,7 +34,7 @@ namespace CGCP::drawer {
 
     static inline QVector3D refVector(QVector3D v, QVector3D n) {
         return v;
-        // float k = dot(v, n);
+        // float k = QVector3D::dotProduct(v, n);
         // //return (k>0.0) ? v : -v;
         // return (k > 0.0) ? v : v - 2.0 * n * k;
     }
@@ -102,7 +102,10 @@ namespace CGCP::drawer {
             color.setZ(color.z() + spe1 * 15.0);
         }
 
-        // col = pow(col, QVector3D(0.4545, 0.4545, 0.4545));
+        color.setX(std::pow(color.x(), 0.4545));
+        color.setY(std::pow(color.y(), 0.4545));
+        color.setZ(std::pow(color.z(), 0.4545));
+
         color *= 1.0 - 0.05 * sp.length();
 
         return color;
@@ -131,32 +134,27 @@ namespace CGCP::drawer {
                 .0, .0, .0, 1.0);
 
         auto colors = new QColor *[scene_->width()];
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i)
             colors[i] = new QColor[scene_->height()];
 
-#pragma omp parallel for collapse(2)
+#pragma omp parallel for collapse(2) schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i) {
             for (size_t j = 0; j < scene_->height(); ++j) {
                 QVector3D col = render(QVector2D(i, j), cam);
+                if (i == 574 && j == 136)
+                    qDebug() << i << " " << j << " "
+                             << col.x() << " "
+                             << col.y() << " "
+                             << col.z() << "\n";
                 colors[i][j] = QColor(255 * col.x(), 255 * col.y(), 255 * col.z());
             }
         }
 
-        QImage image(scene_->width(), scene_->height(), QImage::Format_ARGB32_Premultiplied);
-
-        auto qpen = QPen({0, 0, 0});
-        QPainter qPainter(&image);
-        qPainter.setBrush(Qt::NoBrush);
-        qPainter.setPen(qpen);
-
-        for (size_t i = 0; i < scene_->width(); ++i) {
-            for (size_t j = 0; j < scene_->height(); ++j) {
-                qpen.setColor(colors[i][j]);
-                qPainter.setPen(qpen);
-                qPainter.drawPoint(i, j);
-            }
-        }
+        QImage image(scene_->width(), scene_->height(), QImage::Format_RGB32);
+        for (size_t i = 0; i < scene_->width(); ++i)
+            for (size_t j = 0; j < scene_->height(); ++j)
+                image.setPixelColor(i, j, colors[i][j]);
 
 #pragma omp parallel for
         for (size_t i = 0; i < scene_->width(); ++i)

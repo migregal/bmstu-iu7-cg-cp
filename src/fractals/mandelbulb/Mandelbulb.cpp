@@ -102,9 +102,9 @@ namespace CGCP::fractal {
             w = p + std::pow(r, 8.0) * QVector3D(std::sin(b) * std::sin(a), std::cos(b), std::sin(b) * std::cos(a));
 #endif
             trap.setX(std::min(trap.x(), std::abs(w.x())));
-            trap.setY(std::min(trap.x(), std::abs(w.y())));
-            trap.setZ(std::min(trap.x(), std::abs(w.z())));
-            trap.setZ(std::min(trap.x(), m));
+            trap.setY(std::min(trap.y(), std::abs(w.y())));
+            trap.setZ(std::min(trap.z(), std::abs(w.z())));
+            trap.setZ(std::min(trap.w(), m));
 
             m = QVector3D::dotProduct(w, w);
             if (m > 256.0)

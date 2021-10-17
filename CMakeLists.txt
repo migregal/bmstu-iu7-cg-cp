@@ -13,7 +13,7 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 set(QT_GUI
-        ui/qt/design.h
+        ui/qt/design.ui
         ui/qt/mainwindow.h
         ui/qt/mainwindow.cpp
         )
@@ -38,6 +38,9 @@ set(FRACTALS
         
         src/fractals/mandelbulb/Mandelbulb.h
         src/fractals/mandelbulb/Mandelbulb.cpp
+
+        # src/fractals/julia/Julia.h
+        # src/fractals/julia/Julia.cpp
         )      
 
 

@@ -2,7 +2,8 @@
 
 #include <QtWidgets/QMainWindow>
 
-#include <qt/design.h>
+// #include <qt/design.h>
+#include <qt/ui_design.h>
 
 #include <engine/Engine.h>
 
@@ -23,8 +24,8 @@ protected:
     void update_scene();
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void on_apply_clicked();
+    // void resizeEvent(QResizeEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
