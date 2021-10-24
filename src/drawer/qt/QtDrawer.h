@@ -7,7 +7,6 @@
 
 #include <drawer/Drawer.h>
 #include <fractals/Fractal.h>
-#include <math/Vec3D.h>
 
 namespace CGCP::drawer {
     class QtDrawer : public Drawer {
@@ -21,10 +20,6 @@ namespace CGCP::drawer {
 
         virtual void setImage(const std::shared_ptr<Image> image) override;
 
-        virtual void rotate(const math::Vec3Df &axis, double phi) override;
-        virtual void translate(const math::Vec3Df &offset) override;
-        virtual void scale(const math::Vec3Df &scale) override;
-
         virtual ~QtDrawer() override = default;
 
     private:
@@ -32,14 +27,7 @@ namespace CGCP::drawer {
 
         QGraphicsScene *scene_;
 
-        QVector3D scale_{1, 1, 1};
-        QVector3D translate_;
-        QMatrix4x4 rotate_;
-        QMatrix4x4 projective_;
-
         void drawFractal(ProgressCallback callback);
-
-        QPointF transform(const math::Vec3Df &p);
 
         std::atomic_bool cancelled_ = false;
         std::atomic_bool finished_ = true;

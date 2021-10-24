@@ -4,17 +4,17 @@
 
 namespace CGCP::fractal {
 
-    float Mandelbulb::raycast(QVector3D const &ro, QVector3D const &rd, QVector4D &rescol, float px) {
+    float Mandelbulb::raycast(math::Vector3 const &ro, math::Vector3 const &rd, math::Vector4 &rescol, float px) {
         float res = -1.0;
 
         // bounding sphere
-        auto dis = isphere(QVector4D(0.0, 0.0, 0.0, 1.25), ro, rd);
+        auto dis = isphere(math::Vector4(0.0, 0.0, 0.0, 1.25), ro, rd);
         if (dis.y() < 0.0) return -1.0;
         dis.setX(std::max(dis.x(), 0.0f));
         dis.setY(std::min(dis.y(), 10.0f));
 
         // raymarch fractal distance field
-        QVector4D trap;
+        math::Vector4 trap;
 
         float t = dis.x();
         for (int i = 0; i < 128; i++) {
@@ -33,12 +33,12 @@ namespace CGCP::fractal {
         return res;
     }
 
-    QVector3D Mandelbulb::calcNormal(QVector3D &pos, float t, float px) {
-        QVector4D tmp;
-        auto e = QVector2D(1.0, -1.0) * 0.5773 * 0.25 * px;
-        auto e1 = QVector3D(e.x(), e.y(), e.y()), e2 = QVector3D(e.y(), e.y(), e.x()),
-             e3 = QVector3D(e.y(), e.x(), e.y()), e4 = QVector3D(e.x(), e.x(), e.x());
-        return QVector3D(
+    math::Vector3 Mandelbulb::calcNormal(math::Vector3 &pos, float t, float px) {
+        math::Vector4 tmp;
+        auto e = math::Vector2(1.0, -1.0) * 0.5773 * 0.25 * px;
+        auto e1 = math::Vector3(e.x(), e.y(), e.y()), e2 = math::Vector3(e.y(), e.y(), e.x()),
+             e3 = math::Vector3(e.y(), e.x(), e.y()), e4 = math::Vector3(e.x(), e.x(), e.x());
+        return math::Vector3(
                        e1 * map(pos + e1, tmp) +
                        e2 * map(pos + e2, tmp) +
                        e3 * map(pos + e3, tmp) +
@@ -46,11 +46,11 @@ namespace CGCP::fractal {
                 .normalized();
     }
 
-    float Mandelbulb::softshadow(QVector3D const &ro, QVector3D const &rd, float k) {
+    float Mandelbulb::softshadow(math::Vector3 const &ro, math::Vector3 const &rd, float k) {
         float res = 1.0;
         float t = 0.0;
         for (int i = 0; i < 64; i++) {
-            QVector4D kk;
+            math::Vector4 kk;
             float h = map(ro + rd * t, kk);
             res = std::min(res, k * h / t);
             if (res < 0.001) break;
@@ -59,11 +59,11 @@ namespace CGCP::fractal {
         return std::clamp(res, 0.0f, 1.0f);
     }
 
-    float Mandelbulb::map(QVector3D p, QVector4D &resColor) {
-        QVector3D w = p;
-        float m = QVector3D::dotProduct(w, w);
+    float Mandelbulb::map(math::Vector3 p, math::Vector4 &resColor) {
+        math::Vector3 w = p;
+        float m = math::Vector3::dotProduct(w, w);
 
-        auto trap = QVector4D(std::abs(w.x()), std::abs(w.y()), std::abs(w.z()), m);
+        auto trap = math::Vector4(std::abs(w.x()), std::abs(w.y()), std::abs(w.z()), m);
         float dz = 1.0;
 
         for (int i = 0; i < 4; i++) {
@@ -99,37 +99,37 @@ namespace CGCP::fractal {
             float r = w.length();
             float b = 8.0 * std::acos(w.y() / r);
             float a = 8.0 * std::atan(w.x() / w.z());
-            w = p + std::pow(r, 8.0) * QVector3D(std::sin(b) * std::sin(a), std::cos(b), std::sin(b) * std::cos(a));
+            w = p + std::pow(r, 8.0) * math::Vector3(std::sin(b) * std::sin(a), std::cos(b), std::sin(b) * std::cos(a));
 #endif
             trap.setX(std::min(trap.x(), std::abs(w.x())));
             trap.setY(std::min(trap.y(), std::abs(w.y())));
             trap.setZ(std::min(trap.z(), std::abs(w.z())));
             trap.setZ(std::min(trap.w(), m));
 
-            m = QVector3D::dotProduct(w, w);
+            m = math::Vector3::dotProduct(w, w);
             if (m > 256.0)
                 break;
         }
 
-        resColor = QVector4D(m, trap.y(), trap.z(), trap.w());
+        resColor = math::Vector4(m, trap.y(), trap.z(), trap.w());
 
         // distance estimation (through the Hubbard-Douady potential)
         return 0.25 * log(m) * sqrt(m) / dz;
     }
 
-    QVector2D Mandelbulb::isphere(QVector4D const &sph, QVector3D const &ro, QVector3D const &rd) {
-        auto oc = ro - QVector3D(sph.x(), sph.y(), sph.z());
+    math::Vector2 Mandelbulb::isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd) {
+        auto oc = ro - math::Vector3(sph.x(), sph.y(), sph.z());
 
-        float b = QVector3D::dotProduct(oc, rd);
-        float c = QVector3D::dotProduct(oc, oc) - sph.w() * sph.w();
+        float b = math::Vector3::dotProduct(oc, rd);
+        float c = math::Vector3::dotProduct(oc, oc) - sph.w() * sph.w();
 
         float h = b * b - c;
 
-        if (h < 0.0) return QVector2D(-1.0, 0);
+        if (h < 0.0) return math::Vector2(-1.0, 0);
 
         h = sqrt(h);
 
-        return QVector2D(-h - b, h - b);
+        return math::Vector2(-h - b, h - b);
     }
 
 }// namespace CGCP::fractal

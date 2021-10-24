@@ -18,17 +18,10 @@ const QVector3D light1 = QVector3D(0.577, 0.577, -0.577);
 const QVector3D light2 = QVector3D(-0.707, 0.000, 0.707);
 
 namespace CGCP::drawer {
-    static inline QVector3D Vec3Df2QVector3D(const math::Vec3Df &v) {
-        return QVector3D(v.x(), v.y(), v.z());
-    }
-
     QtDrawer::QtDrawer(QGraphicsScene *scene) : scene_(scene){};
 
     void QtDrawer::setFractal(const std::shared_ptr<fractal::Fractal> fractal, ProgressCallback callback) {
-        if (!finished_) {
-            qDebug() << 29;
-            return;
-        }
+        if (!finished_) return;
         finished_ = false;
 
         Drawer::setFractal(fractal, callback);
@@ -201,23 +194,4 @@ namespace CGCP::drawer {
 
         cancelled_ = false;
     };
-
-    QPointF QtDrawer::transform(const math::Vec3Df &p) {
-        return QPointF();
-    }
-
-    void QtDrawer::rotate(const math::Vec3Df &axis, double phi) {
-        rotate_.rotate(phi, axis.x(), axis.y(), axis.z());
-        // drawFractal();
-    }
-
-    void QtDrawer::translate(const math::Vec3Df &offset) {
-        translate_ += Vec3Df2QVector3D(offset);
-        // drawFractal();
-    }
-
-    void QtDrawer::scale(const math::Vec3Df &scale) {
-        scale_ *= Vec3Df2QVector3D(scale);
-        // drawFractal();
-    }
 }// namespace CGCP::drawer

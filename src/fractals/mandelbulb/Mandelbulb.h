@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include <math/Vector.h>
+
 #include <fractals/Fractal.h>
 
 namespace CGCP::fractal {
@@ -10,17 +12,17 @@ namespace CGCP::fractal {
     public:
         Mandelbulb() = default;
 
-        float raycast(QVector3D const &ro, QVector3D const &rd, QVector4D &rescol, float px) override;
+        float raycast(math::Vector3 const &ro, math::Vector3 const &rd, math::Vector4 &rescol, float px) override;
 
         ~Mandelbulb() override = default;
 
-        QVector3D calcNormal(QVector3D &pos, float t, float px) override;
+        math::Vector3 calcNormal(math::Vector3 &pos, float t, float px) override;
 
-        float softshadow(QVector3D const &ro, QVector3D const &rd, float k) override;
+        float softshadow(math::Vector3 const &ro, math::Vector3 const &rd, float k) override;
 
     private:
-        QVector2D isphere(QVector4D const &sph, QVector3D const &ro, QVector3D const &rd);
+        math::Vector2 isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd);
 
-        float map(QVector3D p, QVector4D &resColor);
+        float map(math::Vector3 p, math::Vector4 &resColor);
     };
 }// namespace CGCP::fractal

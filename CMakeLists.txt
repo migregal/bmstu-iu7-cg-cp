@@ -43,12 +43,17 @@ set(FRACTALS
         # src/fractals/julia/Julia.cpp
         )      
 
+set(MATH 
+        src/math/Matrix.h
+        src/math/Vector.h
+        )
 
 add_executable(${PROJECT_NAME}
         ${QT_GUI}
         ${ENGINE}
         ${DRAWER}
         ${FRACTALS}
+        ${MATH}
         main.cpp
         )
         
