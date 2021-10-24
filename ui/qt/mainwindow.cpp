@@ -61,6 +61,7 @@ void MainWindow::update_scene() {
 
     auto fractal = engine_->fractal().get("mandelbulb");
     engine_->drawer().get("main")->setFractal(
+            engine_->camera().get("main"),
             fractal,
             [=](std::shared_ptr<CGCP::drawer::Image> image, double percent) -> void {
                 if (dialog_->wasCanceled()) return;

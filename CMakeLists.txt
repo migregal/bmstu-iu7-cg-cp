@@ -18,12 +18,11 @@ set(QT_GUI
         ui/qt/mainwindow.cpp
         )
 
-set(ENGINE
-        src/engine/Engine.h
-        src/engine/Engine.cpp
+set(CAMERA
+        src/camera/Camera.h
+        src/camera/Camera.cpp
 
-        src/engine/qt/QtEngine.h
-        src/engine/qt/QtEngine.cpp
+        src/camera/CameraSolution.h
         )
 
 set(DRAWER
@@ -32,6 +31,14 @@ set(DRAWER
         src/drawer/qt/QtDrawer.h
         src/drawer/qt/QtDrawer.cpp
         )      
+
+set(ENGINE
+        src/engine/Engine.h
+        src/engine/Engine.cpp
+
+        src/engine/qt/QtEngine.h
+        src/engine/qt/QtEngine.cpp
+        )
 
 set(FRACTALS
         src/fractals/Fractal.h
@@ -50,8 +57,9 @@ set(MATH
 
 add_executable(${PROJECT_NAME}
         ${QT_GUI}
-        ${ENGINE}
+        ${CAMERA}
         ${DRAWER}
+        ${ENGINE}
         ${FRACTALS}
         ${MATH}
         main.cpp

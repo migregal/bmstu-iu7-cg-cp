@@ -20,13 +20,16 @@ const QVector3D light2 = QVector3D(-0.707, 0.000, 0.707);
 namespace CGCP::drawer {
     QtDrawer::QtDrawer(QGraphicsScene *scene) : scene_(scene){};
 
-    void QtDrawer::setFractal(const std::shared_ptr<fractal::Fractal> fractal, ProgressCallback callback) {
+    void QtDrawer::setFractal(
+            const std::shared_ptr<Camera> camera,
+            const std::shared_ptr<fractal::Fractal> fractal,
+            ProgressCallback callback) {
         if (!finished_) return;
         finished_ = false;
 
-        Drawer::setFractal(fractal, callback);
+        Drawer::setFractal(camera, fractal, callback);
 
-        std::thread thr(&QtDrawer::drawFractal, std::ref(*this), callback);
+        std::thread thr(&QtDrawer::drawFractal, std::ref(*this), camera, callback);
         run_thread_ = thr.native_handle();
         thr.detach();
     };
@@ -120,27 +123,7 @@ namespace CGCP::drawer {
         return color;
     }
 
-    void QtDrawer::drawFractal(ProgressCallback callback) {
-        // float time = 22.15 * .1;
-        float time = 0;
-
-        // camera
-        float di = 1.4 + 0.1 * cos(.29 * time);
-        auto ro = di * QVector3D(cos(.33 * time), 0.8 * sin(.37 * time), sin(.31 * time));
-        auto ta = QVector3D(0.0, 0.1, 0.0);
-        float cr = 0.5 * cos(0.1 * time);
-
-        // camera matrix
-        auto cp = QVector3D(sin(cr), cos(cr), 0.0);
-        auto cw = (ta - ro).normalized();
-        auto cu = QVector3D::crossProduct(cw, cp).normalized();
-        auto cv = QVector3D::crossProduct(cu, cw);
-        auto cam = QMatrix4x4(
-                cu.x(), cu.y(), cu.z(), ro.x(),
-                cv.x(), cv.y(), cv.z(), ro.y(),
-                cw.x(), cw.y(), cw.z(), ro.z(),
-                .0, .0, .0, 1.0);
-
+    void QtDrawer::drawFractal(const std::shared_ptr<Camera> camera, ProgressCallback callback) {
         std::shared_ptr<Image> result;
 
         auto colors = new QColor *[scene_->width()];
@@ -153,10 +136,10 @@ namespace CGCP::drawer {
         for (size_t i = 0; i < scene_->width(); ++i) {
             for (size_t j = 0; j < scene_->height(); ++j) {
                 if (cancelled_) continue;
-                QVector3D col = render(QVector2D(i, j), cam);
+                QVector3D col = render(QVector2D(i, scene_->height() - j), camera->getCamera());
                 colors[i][j] = QColor(255 * col.x(), 255 * col.y(), 255 * col.z());
 #pragma omp critical
-                { callback(result, (double(++count) / max)); }
+                callback(result, (double(++count) / max));
             }
         }
 

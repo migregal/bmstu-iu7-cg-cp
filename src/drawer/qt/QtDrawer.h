@@ -14,7 +14,10 @@ namespace CGCP::drawer {
         QtDrawer() = delete;
         explicit QtDrawer(QGraphicsScene *scene);
 
-        virtual void setFractal(const std::shared_ptr<fractal::Fractal> fractal, ProgressCallback callback) override;
+        virtual void setFractal(
+                const std::shared_ptr<Camera> camera,
+                const std::shared_ptr<fractal::Fractal> fractal,
+                ProgressCallback callback) override;
 
         virtual void cancel() override;
 
@@ -27,7 +30,7 @@ namespace CGCP::drawer {
 
         QGraphicsScene *scene_;
 
-        void drawFractal(ProgressCallback callback);
+        void drawFractal(const std::shared_ptr<Camera> camera, ProgressCallback callback);
 
         std::atomic_bool cancelled_ = false;
         std::atomic_bool finished_ = true;
