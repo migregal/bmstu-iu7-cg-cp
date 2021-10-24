@@ -1,8 +1,8 @@
 #pragma once
 
+#include <QProgressDialog>
 #include <QtWidgets/QMainWindow>
 
-// #include <qt/design.h>
 #include <qt/ui_design.h>
 
 #include <engine/Engine.h>
@@ -20,6 +20,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+signals:
+    void drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent);
+
+private slots:
+    void handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent);
+
 protected:
     void update_scene();
 
@@ -29,6 +35,9 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *_scene;
+
+    QGraphicsScene *scene_;
+    QProgressDialog *dialog_;
+
     std::unique_ptr<CGCP::Engine> engine_;
 };

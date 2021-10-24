@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <thread>
 
 #include <QDebug>
 
@@ -23,10 +24,18 @@ namespace CGCP::drawer {
 
     QtDrawer::QtDrawer(QGraphicsScene *scene) : scene_(scene){};
 
-    void QtDrawer::setFractal(const std::shared_ptr<fractal::Fractal> fractal) {
-        Drawer::setFractal(fractal);
-        drawFractal();
+    void QtDrawer::setFractal(const std::shared_ptr<fractal::Fractal> fractal, ProgressCallback callback) {
+        Drawer::setFractal(fractal, callback);
+        std::thread thr(&QtDrawer::drawFractal, std::ref(*this), callback);
+        run_thread_ = thr.native_handle();
+        thr.detach();
     };
+
+    void QtDrawer::setImage(const std::shared_ptr<Image> image) {
+        if (!image)
+            return;
+        scene_->addPixmap(QPixmap::fromImage(*image));
+    }
 
     static inline QVector3D mix(QVector3D const &x, QVector3D const &y, float a) {
         return x * (1 - a) + y * a;
@@ -111,8 +120,7 @@ namespace CGCP::drawer {
         return color;
     }
 
-    void QtDrawer::drawFractal() {
-        scene_->clear();
+    void QtDrawer::drawFractal(ProgressCallback callback) {
         // float time = 22.15 * .1;
         float time = 0;
 
@@ -133,36 +141,36 @@ namespace CGCP::drawer {
                 cw.x(), cw.y(), cw.z(), ro.z(),
                 .0, .0, .0, 1.0);
 
+        std::shared_ptr<Image> result;
+
         auto colors = new QColor *[scene_->width()];
 #pragma omp parallel for schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i)
             colors[i] = new QColor[scene_->height()];
 
+        auto stop = false;
+        size_t count = 0, max = scene_->width() * scene_->height() + 1;
 #pragma omp parallel for collapse(2) schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i) {
             for (size_t j = 0; j < scene_->height(); ++j) {
                 QVector3D col = render(QVector2D(i, j), cam);
-                if (i == 574 && j == 136)
-                    qDebug() << i << " " << j << " "
-                             << col.x() << " "
-                             << col.y() << " "
-                             << col.z() << "\n";
                 colors[i][j] = QColor(255 * col.x(), 255 * col.y(), 255 * col.z());
+#pragma omp critical
+                { callback(result, (double(++count) / max)); }
             }
         }
 
-        QImage image(scene_->width(), scene_->height(), QImage::Format_RGB32);
+        result = std::make_shared<QImage>(scene_->width(), scene_->height(), QImage::Format_RGB32);
         for (size_t i = 0; i < scene_->width(); ++i)
             for (size_t j = 0; j < scene_->height(); ++j)
-                image.setPixelColor(i, j, colors[i][j]);
+                result->setPixelColor(i, j, colors[i][j]);
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i)
             delete[] colors[i];
         delete[] colors;
 
-        scene_->clear();
-        scene_->addPixmap(QPixmap::fromImage(image));
+        callback(result, 1);
     }
 
     QPointF QtDrawer::transform(const math::Vec3Df &p) {
@@ -171,16 +179,16 @@ namespace CGCP::drawer {
 
     void QtDrawer::rotate(const math::Vec3Df &axis, double phi) {
         rotate_.rotate(phi, axis.x(), axis.y(), axis.z());
-        drawFractal();
+        // drawFractal();
     }
 
     void QtDrawer::translate(const math::Vec3Df &offset) {
         translate_ += Vec3Df2QVector3D(offset);
-        drawFractal();
+        // drawFractal();
     }
 
     void QtDrawer::scale(const math::Vec3Df &scale) {
         scale_ *= Vec3Df2QVector3D(scale);
-        drawFractal();
+        // drawFractal();
     }
 }// namespace CGCP::drawer

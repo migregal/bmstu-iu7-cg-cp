@@ -15,7 +15,10 @@ namespace CGCP::drawer {
         QtDrawer() = delete;
         explicit QtDrawer(QGraphicsScene *scene);
 
-        virtual void setFractal(const std::shared_ptr<fractal::Fractal> fractal) override;
+        virtual void setFractal(const std::shared_ptr<fractal::Fractal> fractal, ProgressCallback callback) override;
+
+        virtual void setImage(const std::shared_ptr<Image> image) override;
+
         virtual void rotate(const math::Vec3Df &axis, double phi) override;
         virtual void translate(const math::Vec3Df &offset) override;
         virtual void scale(const math::Vec3Df &scale) override;
@@ -32,8 +35,10 @@ namespace CGCP::drawer {
         QMatrix4x4 rotate_;
         QMatrix4x4 projective_;
 
-        void drawFractal();
+        void drawFractal(ProgressCallback callback);
 
         QPointF transform(const math::Vec3Df &p);
+
+        pthread_t run_thread_;
     };
 }// namespace CGCP::drawer
