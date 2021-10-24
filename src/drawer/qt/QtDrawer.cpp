@@ -25,7 +25,14 @@ namespace CGCP::drawer {
     QtDrawer::QtDrawer(QGraphicsScene *scene) : scene_(scene){};
 
     void QtDrawer::setFractal(const std::shared_ptr<fractal::Fractal> fractal, ProgressCallback callback) {
+        if (!finished_) {
+            qDebug() << 29;
+            return;
+        }
+        finished_ = false;
+
         Drawer::setFractal(fractal, callback);
+
         std::thread thr(&QtDrawer::drawFractal, std::ref(*this), callback);
         run_thread_ = thr.native_handle();
         thr.detach();
@@ -144,7 +151,6 @@ namespace CGCP::drawer {
         std::shared_ptr<Image> result;
 
         auto colors = new QColor *[scene_->width()];
-#pragma omp parallel for schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i)
             colors[i] = new QColor[scene_->height()];
 
@@ -153,6 +159,7 @@ namespace CGCP::drawer {
 #pragma omp parallel for collapse(2) schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i) {
             for (size_t j = 0; j < scene_->height(); ++j) {
+                if (cancelled_) continue;
                 QVector3D col = render(QVector2D(i, j), cam);
                 colors[i][j] = QColor(255 * col.x(), 255 * col.y(), 255 * col.z());
 #pragma omp critical
@@ -160,18 +167,40 @@ namespace CGCP::drawer {
             }
         }
 
-        result = std::make_shared<QImage>(scene_->width(), scene_->height(), QImage::Format_RGB32);
-        for (size_t i = 0; i < scene_->width(); ++i)
-            for (size_t j = 0; j < scene_->height(); ++j)
-                result->setPixelColor(i, j, colors[i][j]);
+        if (!cancelled_) {
+            result = std::make_shared<QImage>(scene_->width(), scene_->height(), QImage::Format_RGB32);
+            for (size_t i = 0; i < scene_->width(); ++i)
+                for (size_t j = 0; j < scene_->height(); ++j)
+                    result->setPixelColor(i, j, colors[i][j]);
+        }
 
-#pragma omp parallel for schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i)
             delete[] colors[i];
         delete[] colors;
 
+        finished_ = true;
+
         callback(result, 1);
     }
+
+    void QtDrawer::cancel() {
+        if (finished_)
+            return;
+
+        cancelled_ = true;
+
+        // wait 3 seconds before cancel thread using system
+        for (int i = 30; !finished_ && i > 0; i--) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        if (!finished_) {
+            pthread_cancel(run_thread_);
+            finished_ = true;
+        }
+
+        cancelled_ = false;
+    };
 
     QPointF QtDrawer::transform(const math::Vec3Df &p) {
         return QPointF();

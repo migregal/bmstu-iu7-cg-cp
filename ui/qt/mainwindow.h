@@ -23,8 +23,12 @@ public:
 signals:
     void drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent);
 
+    void cancel_drawer();
+
 private slots:
     void handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent);
+
+    void handle_cancel_drawer();
 
 protected:
     void update_scene();
@@ -38,6 +42,8 @@ private:
 
     QGraphicsScene *scene_;
     QProgressDialog *dialog_;
+
+    QMetaObject::Connection dialog_conn;
 
     std::unique_ptr<CGCP::Engine> engine_;
 };

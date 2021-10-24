@@ -17,6 +17,8 @@ namespace CGCP::drawer {
 
         virtual void setFractal(const std::shared_ptr<fractal::Fractal> fractal, ProgressCallback callback) override;
 
+        virtual void cancel() override;
+
         virtual void setImage(const std::shared_ptr<Image> image) override;
 
         virtual void rotate(const math::Vec3Df &axis, double phi) override;
@@ -39,6 +41,8 @@ namespace CGCP::drawer {
 
         QPointF transform(const math::Vec3Df &p);
 
+        std::atomic_bool cancelled_ = false;
+        std::atomic_bool finished_ = true;
         pthread_t run_thread_;
     };
 }// namespace CGCP::drawer
