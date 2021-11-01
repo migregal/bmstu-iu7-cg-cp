@@ -35,6 +35,11 @@ protected:
 
 protected:
     void on_apply_clicked();
+
+    void on_rotation_apply_clicked();
+
+    void on_translation_apply_clicked();
+
     // void resizeEvent(QResizeEvent *event) override;
 
 private:

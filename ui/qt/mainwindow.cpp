@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <QMetaType>
+
 #include <QFileDialog>
 #include <QMessageBox>
 
@@ -15,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     dialog_ = new QProgressDialog("Вычисление...", "Отменить", 0, 100, this);
     dialog_->setWindowModality(Qt::WindowModal);
     dialog_->setAutoReset(true);
+    dialog_->close();
 
     scene_ = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene_);
@@ -24,11 +27,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     engine_ = std::make_unique<CGCP::QtEngine>(scene_);
 
+    qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>("std::shared_ptr<CGCP::drawer::Image>");
+
     connect(
-            ui->applyButton,
+            ui->buildImageButton,
             &QPushButton::clicked,
             this,
             &MainWindow::on_apply_clicked);
+
+    connect(
+            ui->rotationApply,
+            &QPushButton::clicked,
+            this,
+            &MainWindow::on_rotation_apply_clicked);
+
+    connect(
+            ui->translationApply,
+            &QPushButton::clicked,
+            this,
+            &MainWindow::on_translation_apply_clicked);
 
     connect(
             this,
@@ -48,6 +65,28 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::on_apply_clicked() {
+    update_scene();
+}
+
+void MainWindow::on_rotation_apply_clicked() {
+    engine_->camera().get("main")->rotate(
+            {
+                    (float) ui->rotationX->value(),
+                    (float) ui->rotationY->value(),
+                    (float) ui->rotationZ->value(),
+            },
+            ui->rotationAlpha->value());
+
+    update_scene();
+}
+
+void MainWindow::on_translation_apply_clicked() {
+    engine_->camera().get("main")->translate(
+            {
+                    (float) ui->translationX->value(),
+                    (float) ui->translationY->value(),
+                    (float) ui->translationZ->value(),
+            });
     update_scene();
 }
 

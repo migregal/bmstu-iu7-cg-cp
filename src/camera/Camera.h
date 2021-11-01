@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math/Matrix.h>
+#include <math/Vector.h>
 
 namespace CGCP {
     class Camera {
@@ -10,6 +11,10 @@ namespace CGCP {
         virtual ~Camera() = default;
 
         math::Matrix4x4 &getCamera();
+
+        void rotate(const math::Vector3 &axis, double phi);
+
+        void translate(const math::Vector3 &offset);
 
     private:
         math::Matrix4x4 camera_;

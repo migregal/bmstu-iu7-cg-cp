@@ -15,4 +15,12 @@ namespace CGCP {
     math::Matrix4x4 &Camera::getCamera() {
         return camera_;
     }
+
+    void Camera::rotate(const math::Vector3 &axis, double phi) {
+        camera_.rotate(phi, axis.x(), axis.y(), axis.z());
+    }
+
+    void Camera::translate(const math::Vector3 &offset) {
+        camera_.translate(offset);
+    }
 }// namespace CGCP

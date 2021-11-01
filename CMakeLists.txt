@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.16)
 project(bmstu_iu7_cg_course)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS
+find_package(Qt5 COMPONENTS
         Core
         Gui
         Widgets
@@ -27,10 +27,10 @@ set(CAMERA
 
 set(DRAWER
         src/drawer/Drawer.h
-        
+
         src/drawer/qt/QtDrawer.h
         src/drawer/qt/QtDrawer.cpp
-        )      
+        )
 
 set(ENGINE
         src/engine/Engine.h
@@ -42,15 +42,15 @@ set(ENGINE
 
 set(FRACTALS
         src/fractals/Fractal.h
-        
+
         src/fractals/mandelbulb/Mandelbulb.h
         src/fractals/mandelbulb/Mandelbulb.cpp
 
         # src/fractals/julia/Julia.h
         # src/fractals/julia/Julia.cpp
-        )      
+        )
 
-set(MATH 
+set(MATH
         src/math/Matrix.h
         src/math/Vector.h
         )
@@ -64,11 +64,11 @@ add_executable(${PROJECT_NAME}
         ${MATH}
         main.cpp
         )
-        
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-        Qt6::Core
-        Qt6::Gui
-        Qt6::Widgets
+        Qt5::Core
+        Qt5::Gui
+        Qt5::Widgets
         )
 
 find_package(OpenMP)
