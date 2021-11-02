@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     dialog_ = new QProgressDialog("Вычисление...", "Отменить", 0, 100, this);
     dialog_->setWindowModality(Qt::WindowModal);
-    dialog_->setAutoReset(true);
     dialog_->close();
 
     scene_ = new QGraphicsScene(this);
@@ -28,6 +27,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     engine_ = std::make_unique<CGCP::QtEngine>(scene_);
 
     qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>("std::shared_ptr<CGCP::drawer::Image>");
+
+    keyCtrlZ = new QShortcut(this);
+    keyCtrlZ->setKey(Qt::CTRL + Qt::Key_Z);
+    connect(keyCtrlZ, &QShortcut::activated, this, &MainWindow::on_ctrl_z_pressed);
+
+    keyCtrlShiftZ = new QShortcut(this);
+    keyCtrlShiftZ->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
+    connect(keyCtrlShiftZ, &QShortcut::activated, this, &MainWindow::on_ctrl_shift_z_pressed);
 
     connect(
             ui->buildImageButton,
@@ -65,10 +72,11 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::on_apply_clicked() {
-    update_scene();
+    update_scene(nullptr);
 }
 
 void MainWindow::on_rotation_apply_clicked() {
+    stack_backward_.push(engine_->camera().get("main")->getCamera());
     engine_->camera().get("main")->rotate(
             {
                     (float) ui->rotationX->value(),
@@ -77,23 +85,52 @@ void MainWindow::on_rotation_apply_clicked() {
             },
             ui->rotationAlpha->value());
 
-    update_scene();
+    update_scene([this]() -> void {
+        engine_->camera().get("main")->setCamera(stack_backward_.pop());
+    });
 }
 
 void MainWindow::on_translation_apply_clicked() {
+    stack_backward_.push(engine_->camera().get("main")->getCamera());
     engine_->camera().get("main")->translate(
             {
                     (float) ui->translationX->value(),
                     (float) ui->translationY->value(),
                     (float) ui->translationZ->value(),
             });
-    update_scene();
+
+    update_scene([this]() -> void {
+        engine_->camera().get("main")->setCamera(stack_backward_.pop());
+    });
 }
 
-void MainWindow::update_scene() {
+void MainWindow::on_ctrl_z_pressed() {
+    if (stack_backward_.isEmpty()) return;
+
+    stack_forward_.push(engine_->camera().get("main")->getCamera());
+    engine_->camera().get("main")->setCamera(stack_backward_.pop());
+
+    update_scene([=]() -> void {
+        stack_backward_.push(engine_->camera().get("main")->getCamera());
+        engine_->camera().get("main")->setCamera(stack_forward_.pop());
+    });
+}
+
+void MainWindow::on_ctrl_shift_z_pressed() {
+    if (stack_forward_.isEmpty()) return;
+
+    stack_backward_.push(engine_->camera().get("main")->getCamera());
+    engine_->camera().get("main")->setCamera(stack_forward_.pop());
+
+    update_scene([=]() -> void {
+        stack_forward_.push(engine_->camera().get("main")->getCamera());
+        engine_->camera().get("main")->setCamera(stack_backward_.pop());
+    });
+}
+
+void MainWindow::update_scene(std::function<void()> cancel_callback) {
     auto rcontent = ui->graphicsView->contentsRect();
     scene_->setSceneRect(0, 0, rcontent.width(), rcontent.height());
-    scene_->clear();
 
     dialog_->reset();
     dialog_->show();
@@ -103,8 +140,16 @@ void MainWindow::update_scene() {
             engine_->camera().get("main"),
             fractal,
             [=](std::shared_ptr<CGCP::drawer::Image> image, double percent) -> void {
-                if (dialog_->wasCanceled()) return;
-                emit drawer_progress(image, percent);
+                static std::atomic_bool first_cancel = true;
+                if (!dialog_->wasCanceled()) {
+                    emit drawer_progress(image, percent);
+                    return;
+                }
+
+                if (first_cancel && cancel_callback) {
+                    first_cancel = false;
+                    cancel_callback();
+                }
             });
 }
 
@@ -116,8 +161,10 @@ void MainWindow::handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> ima
     if (percent >= 1 - std::numeric_limits<double>::epsilon())
         dialog_->close();
 
-    if (image)
+    if (image) {
+        scene_->clear();
         engine_->drawer().get("main")->setImage(image);
+    }
 }
 
 void MainWindow::handle_cancel_drawer() {

@@ -12,6 +12,10 @@ namespace CGCP {
         camera_.lookAt(cameraPosition, QVector3D(0, 0, 0), cameraUpDirection);
     }
 
+    void Camera::setCamera(const math::Matrix4x4 &pos) {
+        camera_ = pos;
+    }
+
     math::Matrix4x4 &Camera::getCamera() {
         return camera_;
     }

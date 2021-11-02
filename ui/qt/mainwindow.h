@@ -1,6 +1,9 @@
 #pragma once
 
+#include <QPixmap>
 #include <QProgressDialog>
+#include <QShortcut>
+#include <QStack>
 #include <QtWidgets/QMainWindow>
 
 #include <qt/ui_design.h>
@@ -31,7 +34,7 @@ private slots:
     void handle_cancel_drawer();
 
 protected:
-    void update_scene();
+    void update_scene(std::function<void()> cancel_callback);
 
 protected:
     void on_apply_clicked();
@@ -40,6 +43,9 @@ protected:
 
     void on_translation_apply_clicked();
 
+    void on_ctrl_z_pressed();
+
+    void on_ctrl_shift_z_pressed();
     // void resizeEvent(QResizeEvent *event) override;
 
 private:
@@ -51,4 +57,8 @@ private:
     QMetaObject::Connection dialog_conn;
 
     std::unique_ptr<CGCP::Engine> engine_;
+
+    QStack<QMatrix4x4> stack_backward_, stack_forward_;
+
+    QShortcut *keyCtrlZ, *keyCtrlShiftZ;
 };

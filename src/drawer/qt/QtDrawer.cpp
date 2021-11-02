@@ -37,7 +37,7 @@ namespace CGCP::drawer {
     void QtDrawer::setImage(const std::shared_ptr<Image> image) {
         if (!image)
             return;
-        scene_->addPixmap(QPixmap::fromImage(*image));
+        scene_->addPixmap(Pixmap::fromImage(*image));
     }
 
     static inline QVector3D mix(QVector3D const &x, QVector3D const &y, float a) {

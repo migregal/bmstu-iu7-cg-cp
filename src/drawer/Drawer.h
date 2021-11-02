@@ -9,6 +9,7 @@
 
 namespace CGCP::drawer {
     using Image = QImage;
+    using Pixmap = QPixmap;
 
     class Drawer {
     public:
