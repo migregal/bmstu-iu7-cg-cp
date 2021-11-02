@@ -237,6 +237,20 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>buildImageButton</tabstop>
+  <tabstop>rotationX</tabstop>
+  <tabstop>rotationY</tabstop>
+  <tabstop>rotationZ</tabstop>
+  <tabstop>rotationAlpha</tabstop>
+  <tabstop>rotationApply</tabstop>
+  <tabstop>translationX</tabstop>
+  <tabstop>translationY</tabstop>
+  <tabstop>translationZ</tabstop>
+  <tabstop>translationApply</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
