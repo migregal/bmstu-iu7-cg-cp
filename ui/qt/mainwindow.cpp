@@ -69,6 +69,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 MainWindow::~MainWindow() {
     delete ui;
+    delete scene_;
+    delete dialog_;
+    delete keyCtrlZ;
+    delete keyCtrlShiftZ;
 }
 
 void MainWindow::on_apply_clicked() {
