@@ -46,6 +46,9 @@ namespace CGCP::drawer {
                              32.0);
         } else {
             color = color_;
+            color = mix(color, {0.10, 0.20, 0.30}, std::clamp(tra.y(), 0.0f, 1.0f));
+            color = mix(color, {0.02, 0.30, 0.10}, std::clamp(tra.z() * tra.z(), 0.0f, 1.0f));
+            color = mix(color, {0.30, 0.10, 0.02}, std::clamp(pow(tra.w(), 6.0), 0.0, 1.0));
 
             auto pos = ro + t * rd;
 
@@ -54,9 +57,6 @@ namespace CGCP::drawer {
 
             double lighting = computeLighting(pos, nor, -1. * rd, px);
             color *= lighting;
-
-            // auto light = math::Vector3(10, 10, -10).normalized();
-            // color *= math::Vector3::dotProduct(nor, light);
         }
 
         return math::Vector3(
