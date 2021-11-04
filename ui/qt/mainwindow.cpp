@@ -24,6 +24,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    picker_ = new ColorPicker(this, {120, 120, 120}, "Выбор цвета");
+
+    ui->color_frame->layout()->addWidget(picker_);
+
     engine_ = std::make_unique<CGCP::QtEngine>(scene_);
 
     qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>(
@@ -155,17 +159,18 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
         lights->push_back(engine_->light().get(key));
     }
 
+    auto color = picker_->color();
     auto fractal = engine_->fractal().get("mandelbulb");
     engine_->drawer().get("main")->setFractal(
             {engine_->camera().get("main"),
              lights,
              fractal,
-             {(float) ui->colorR->value() / 255.f,
-              (float) ui->colorG->value() / 255.f,
-              (float) ui->colorB->value() / 255.f},
+             {(float) color.red() / 255.f,
+              (float) color.green() / 255.f,
+              (float) color.blue() / 255.f},
              ui->approximateFractal->isChecked()},
-            [=](std::shared_ptr<CGCP::drawer::Image> image, double percent)
-                    -> void {
+            [=](std::shared_ptr<CGCP::drawer::Image> image,
+                double percent) -> void {
                 static std::atomic_bool first_cancel = true;
                 if (!dialog_->wasCanceled()) {
                     emit drawer_progress(image, percent);

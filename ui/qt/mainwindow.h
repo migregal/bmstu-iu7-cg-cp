@@ -8,6 +8,8 @@
 
 #include <qt/ui_design.h>
 
+#include <qt/widgets/ColorPicker.h>
+
 #include <engine/Engine.h>
 
 QT_BEGIN_NAMESPACE
@@ -53,6 +55,8 @@ private:
 
     QGraphicsScene *scene_;
     QProgressDialog *dialog_;
+
+    ColorPicker *picker_;
 
     QMetaObject::Connection dialog_conn;
 

@@ -16,6 +16,9 @@ set(QT_GUI
         ui/qt/design.ui
         ui/qt/mainwindow.h
         ui/qt/mainwindow.cpp
+
+        ui/qt/widgets/ColorPicker.h
+        ui/qt/widgets/ColorPicker.cpp
         )
 
 set(CAMERA
