@@ -50,6 +50,11 @@ set(FRACTALS
         # src/fractals/julia/Julia.cpp
         )
 
+set(LIGHT
+        src/light/Light.h
+        src/light/Light.cpp
+        )
+
 set(MATH
         src/math/Matrix.h
         src/math/Vector.h
@@ -61,6 +66,7 @@ add_executable(${PROJECT_NAME}
         ${DRAWER}
         ${ENGINE}
         ${FRACTALS}
+        ${LIGHT}
         ${MATH}
         main.cpp
         )

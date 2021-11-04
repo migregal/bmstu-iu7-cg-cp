@@ -5,6 +5,7 @@
 #include <camera/CameraSolution.h>
 #include <drawer/DrawerSolution.h>
 #include <fractals/FractalSolution.h>
+#include <light/LightSolution.h>
 
 namespace CGCP {
     class Engine {
@@ -18,9 +19,12 @@ namespace CGCP {
 
         CameraSolution &camera() { return *camera_; };
 
+        light::LightSolution &light() { return *light_; }
+
     private:
         std::unique_ptr<CameraSolution> camera_;
         std::unique_ptr<drawer::DrawerSolution> drawer_;
         std::unique_ptr<fractal::FractalSolution> fractal_;
+        std::unique_ptr<light::LightSolution> light_;
     };
 }// namespace CGCP
