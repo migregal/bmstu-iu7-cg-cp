@@ -26,15 +26,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     engine_ = std::make_unique<CGCP::QtEngine>(scene_);
 
-    qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>("std::shared_ptr<CGCP::drawer::Image>");
+    qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>(
+            "std::shared_ptr<CGCP::drawer::Image>");
 
     keyCtrlZ = new QShortcut(this);
     keyCtrlZ->setKey(Qt::CTRL + Qt::Key_Z);
-    connect(keyCtrlZ, &QShortcut::activated, this, &MainWindow::on_ctrl_z_pressed);
+    connect(
+            keyCtrlZ,
+            &QShortcut::activated,
+            this,
+            &MainWindow::on_ctrl_z_pressed);
 
     keyCtrlShiftZ = new QShortcut(this);
     keyCtrlShiftZ->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
-    connect(keyCtrlShiftZ, &QShortcut::activated, this, &MainWindow::on_ctrl_shift_z_pressed);
+    connect(
+            keyCtrlShiftZ,
+            &QShortcut::activated,
+            this,
+            &MainWindow::on_ctrl_shift_z_pressed);
 
     connect(
             ui->buildImageButton,
@@ -151,6 +160,9 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
             {engine_->camera().get("main"),
              lights,
              fractal,
+             {(float) ui->colorR->value() / 255.f,
+              (float) ui->colorG->value() / 255.f,
+              (float) ui->colorB->value() / 255.f},
              ui->approximateFractal->isChecked()},
             [=](std::shared_ptr<CGCP::drawer::Image> image, double percent)
                     -> void {
@@ -167,7 +179,9 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
             });
 }
 
-void MainWindow::handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent) {
+void MainWindow::handle_drawer_progress(
+        std::shared_ptr<CGCP::drawer::Image> image,
+        double percent) {
     if (dialog_->wasCanceled()) return;
 
     dialog_->setValue(percent * 100);

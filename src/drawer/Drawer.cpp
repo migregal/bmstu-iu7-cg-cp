@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace CGCP::drawer {
     const auto light1 = math::Vector3(0.577, 0.577, -0.577);
@@ -44,51 +45,19 @@ namespace CGCP::drawer {
                                         1.0f),
                              32.0);
         } else {
-            color = math::Vector3(0.01, 0.01, 0.01);
-            color = mix(color, math::Vector3(0.10, 0.20, 0.30), std::clamp(tra.y(), 0.0f, 1.0f));
-            color = mix(color, math::Vector3(0.02, 0.10, 0.30), std::clamp(tra.z() * tra.z(), 0.0f, 1.0f));
-            color = mix(color, math::Vector3(0.30, 0.10, 0.02), std::clamp(std::pow(tra.w(), 6.0), 0.0, 1.0));
-            color *= 0.5;
+            color = color_;
 
             auto pos = ro + t * rd;
+
             auto nor = fractal_->calcNormal(pos, t, px);
             nor = refVector(nor, -rd);
 
-            auto hal = (light1 - rd).normalized();
-            auto ref = reflect(rd, nor);
-            float occ = std::clamp(0.05 * std::log(tra.x()), 0.0, 1.0);
-            float fac = std::clamp(1.0 + math::Vector3::dotProduct(rd, nor), 0.0, 1.0);
+            double lighting = computeLighting(pos, nor, -1. * rd, px);
+            color *= lighting;
 
-            // sun
-            float sha1 = fractal_->softshadow(pos + 0.001 * nor, light1, 32.0);
-            float dif1 = std::clamp(math::Vector3::dotProduct(light1, nor), 0.0f, 1.0f) * sha1;
-            float spe1 = std::pow(std::clamp(math::Vector3::dotProduct(nor, hal), 0.0f, 1.0f), 32.0) * dif1 * (0.04 + 0.96 * std::pow(std::clamp(1.0f - math::Vector3::dotProduct(hal, light1), 0.0f, 1.0f), 5.0));
-            // bounce
-            float dif2 = std::clamp(0.5f + 0.5f * math::Vector3::dotProduct(light2, nor), 0.0f, 1.0f) * occ;
-            // sky
-            float dif3 = (0.7 + 0.3 * nor.y()) * (0.2 + 0.8 * occ);
-
-            auto lin = math::Vector3(0.0, 0.0, 0.0);
-            lin += 12.0 * math::Vector3(1.50, 1.10, 0.70) * dif1;
-            lin += 4.0 * math::Vector3(0.25, 0.20, 0.15) * dif2;
-            lin += 1.5 * math::Vector3(0.10, 0.20, 0.30) * dif3;
-            lin += 2.5 * math::Vector3(0.35, 0.30, 0.25) * (0.05 + 0.95 * occ);
-            lin.setX(lin.x() + 4.0 * fac * occ);
-            lin.setY(lin.y() + 4.0 * fac * occ);
-            lin.setZ(lin.z() + 4.0 * fac * occ);
-            color *= lin;
-            color.setX(std::pow(color.x(), 0.7));
-            color.setY(std::pow(color.y(), 0.9));
-            color.setX(color.x() + spe1 * 15.0);
-            color.setY(color.y() + spe1 * 15.0);
-            color.setZ(color.z() + spe1 * 15.0);
+            // auto light = math::Vector3(10, 10, -10).normalized();
+            // color *= math::Vector3::dotProduct(nor, light);
         }
-
-        color.setX(std::pow(color.x(), 0.4545));
-        color.setY(std::pow(color.y(), 0.4545));
-        color.setZ(std::pow(color.z(), 0.4545));
-
-        color *= 1.0 - 0.05 * sp.length();
 
         return math::Vector3(
                 std::clamp(color.x(), 0.0f, 1.0f),
@@ -99,7 +68,10 @@ namespace CGCP::drawer {
     double Drawer::computeLighting(
             const math::Vector3 &point,
             const math::Vector3 &normal,
-            const math::Vector3 &view) {
+            const math::Vector3 &view,
+            const float px) {
+        auto specular = 1000;
+
         if (!lights_) return 0.0;
 
         double intensity = 0;
@@ -107,9 +79,40 @@ namespace CGCP::drawer {
         double length_v = view.length();
 
         for (const auto &light : *lights_) {
+            if (light->getType() == light::LightType::Ambient) {
+                intensity += light->getIntensity();
+                continue;
+            }
+
+            auto vec_l = math::Vector3();
+            double t_max;
+
+            if (light->getType() == light::LightType::Point) {
+                vec_l = light->getPosition() - point;
+                t_max = 1.0;
+            } else {
+                vec_l = light->getPosition();
+                t_max = std::numeric_limits<double>::max();
+            }
+
+            math::Vector4 tra;
+            if (fractal_->raycast(point, vec_l, tra, px) > 0) continue;
+
+            // diffuse reflection
+            double n_dot_l = math::Vector3::dotProduct(normal, vec_l);
+            if (n_dot_l > 0)
+                intensity += light->getIntensity() * n_dot_l /
+                             (length_n * vec_l.length());
+
+            // specular reflection
+            auto vec_r = normal * (2.f * math::Vector3::dotProduct(normal, vec_l)) - vec_l;
+            double r_dot_v = math::Vector3::dotProduct(vec_r, view);
+            if (r_dot_v > 0)
+                intensity += light->getIntensity() *
+                             std::pow(r_dot_v / (vec_r.length() * length_v), specular);
         }
 
-        return 0.0;
+        return intensity;
     }
 
     math::Vector2 Drawer::getScreenPos(const math::Vector2 &point) {

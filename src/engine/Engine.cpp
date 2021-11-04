@@ -14,7 +14,16 @@ namespace CGCP {
             return std::make_unique<fractal::Mandelbulb>();
         });
         light().add("ambient", []() -> std::unique_ptr<light::LightSource> {
-            return std::make_unique<light::LightSource>(math::Vector3(), 0.2, light::LightType::Ambirent);
+            return std::make_unique<light::LightSource>(
+                    math::Vector3(),
+                    0.4,
+                    light::LightType::Ambient);
+        });
+        light().add("directed", []() -> std::unique_ptr<light::LightSource> {
+            return std::make_unique<light::LightSource>(
+                    math::Vector3(10, 10, -10),
+                    0.7,
+                    light::LightType::Directional);
         });
     };
 }// namespace CGCP

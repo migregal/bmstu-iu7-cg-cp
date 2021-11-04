@@ -7,6 +7,8 @@
 #include <math/Matrix.h>
 #include <math/Vector.h>
 
+#include <math/Vector.h>
+
 #include <camera/Camera.h>
 #include <fractals/Fractal.h>
 #include <light/Light.h>
@@ -17,6 +19,7 @@ namespace CGCP::drawer {
         const std::shared_ptr<Camera> camera;
         const std::shared_ptr<LightsList> lights;
         const std::shared_ptr<fractal::Fractal> fractal;
+        const math::Vector3 &color;
         const bool approx;
     };
 
@@ -34,6 +37,7 @@ namespace CGCP::drawer {
             camera_ = args.camera;
             lights_ = args.lights;
             fractal_ = args.fractal;
+            color_ = args.color;
             approx_ = args.approx;
         };
 
@@ -51,7 +55,8 @@ namespace CGCP::drawer {
         double computeLighting(
                 const math::Vector3 &point,
                 const math::Vector3 &normal,
-                const math::Vector3 &view);
+                const math::Vector3 &view,
+                const float px);
 
         virtual math::Vector2 getScreenPos(const math::Vector2 &point);
 
@@ -61,6 +66,7 @@ namespace CGCP::drawer {
         std::shared_ptr<Camera> camera_;
         std::shared_ptr<LightsList> lights_;
         std::shared_ptr<fractal::Fractal> fractal_;
+        math::Vector3 color_;
         bool approx_;
     };
 }// namespace CGCP::drawer

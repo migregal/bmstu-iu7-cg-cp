@@ -4,7 +4,7 @@
 
 namespace CGCP::light {
     enum LightType {
-        Ambirent = 0x00,
+        Ambient = 0x00,
         Point = 0x01,
         Directional = 0x02
     };

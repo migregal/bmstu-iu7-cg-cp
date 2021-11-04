@@ -35,14 +35,17 @@ namespace CGCP::fractal {
 
     math::Vector3 Mandelbulb::calcNormal(math::Vector3 &pos, float t, float px) {
         math::Vector4 tmp;
-        auto e = math::Vector2(1.0, -1.0) * 0.5773 * 0.25 * px;
-        auto e1 = math::Vector3(e.x(), e.y(), e.y()), e2 = math::Vector3(e.y(), e.y(), e.x()),
-             e3 = math::Vector3(e.y(), e.x(), e.y()), e4 = math::Vector3(e.x(), e.x(), e.x());
+        // auto e = math::Vector2(1.0, -1.0) * 0.5773 * 0.25 * px;
+        auto e = math::Vector2(1.0, -1.0) * 0.5773 * 2 * px;
+        auto e_xyy = math::Vector3(e.x(), e.y(), e.y()),
+             e_yyx = math::Vector3(e.y(), e.y(), e.x()),
+             e_yxy = math::Vector3(e.y(), e.x(), e.y()),
+             e_xxx = math::Vector3(e.x(), e.x(), e.x());
         return math::Vector3(
-                       e1 * map(pos + e1, tmp) +
-                       e2 * map(pos + e2, tmp) +
-                       e3 * map(pos + e3, tmp) +
-                       e4 * map(pos + e4, tmp))
+                       e_xyy * map(pos + e_xyy, tmp) +
+                       e_yyx * map(pos + e_yyx, tmp) +
+                       e_yxy * map(pos + e_yxy, tmp) +
+                       e_xxx * map(pos + e_xxx, tmp))
                 .normalized();
     }
 
@@ -98,8 +101,11 @@ namespace CGCP::fractal {
             // z = z^8+z
             float r = w.length();
             float b = 8.0 * std::acos(w.y() / r);
-            float a = 8.0 * std::atan(w.x() / w.z());
-            w = p + std::pow(r, 8.0) * math::Vector3(std::sin(b) * std::sin(a), std::cos(b), std::sin(b) * std::cos(a));
+            float a = 8.0 * std::atan2(w.x(), w.z());
+            w = p + std::pow(r, 8.0) *
+                            math::Vector3(std::sin(b) * std::sin(a),
+                                          std::cos(b),
+                                          std::sin(b) * std::cos(a));
 #endif
             trap.setX(std::min(trap.x(), std::abs(w.x())));
             trap.setY(std::min(trap.y(), std::abs(w.y())));
