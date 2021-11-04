@@ -27,6 +27,7 @@ set(CAMERA
 
 set(DRAWER
         src/drawer/Drawer.h
+        src/drawer/Drawer.cpp
 
         src/drawer/qt/QtDrawer.h
         src/drawer/qt/QtDrawer.cpp

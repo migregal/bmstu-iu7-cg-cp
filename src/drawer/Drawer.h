@@ -4,6 +4,9 @@
 
 #include <QImage>
 
+#include <math/Matrix.h>
+#include <math/Vector.h>
+
 #include <camera/Camera.h>
 #include <fractals/Fractal.h>
 #include <light/Light.h>
@@ -39,6 +42,20 @@ namespace CGCP::drawer {
         virtual void setImage(const std::shared_ptr<Image> image) = 0;
 
         virtual ~Drawer() = default;
+
+    protected:
+        math::Vector3 render(
+                math::Vector2 const &p,
+                math::Matrix4x4 const &cam);
+
+        double computeLighting(
+                const math::Vector3 &point,
+                const math::Vector3 &normal,
+                const math::Vector3 &view);
+
+        virtual math::Vector2 getScreenPos(const math::Vector2 &point);
+
+        virtual float getPx(float fle);
 
     protected:
         std::shared_ptr<Camera> camera_;

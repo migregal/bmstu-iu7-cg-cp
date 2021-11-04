@@ -24,12 +24,15 @@ namespace CGCP::drawer {
 
         virtual ~QtDrawer() override = default;
 
+    protected:
+        math::Vector2 getScreenPos(const math::Vector2 &point) override;
+
+        float getPx(float fle) override;
+
     private:
-        QVector3D render(QVector2D const &p, QMatrix4x4 const &cam);
+        void drawFractal(ProgressCallback callback);
 
         QGraphicsScene *scene_;
-
-        void drawFractal(ProgressCallback callback);
 
         std::atomic_bool cancelled_ = false;
         std::atomic_bool finished_ = true;
