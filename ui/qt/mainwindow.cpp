@@ -80,6 +80,7 @@ void MainWindow::on_apply_clicked() {
 }
 
 void MainWindow::on_rotation_apply_clicked() {
+    stack_forward_.clear();
     stack_backward_.push(engine_->camera().get("main")->getCamera());
     engine_->camera().get("main")->rotate(
             {
@@ -95,6 +96,7 @@ void MainWindow::on_rotation_apply_clicked() {
 }
 
 void MainWindow::on_translation_apply_clicked() {
+    stack_forward_.clear();
     stack_backward_.push(engine_->camera().get("main")->getCamera());
     engine_->camera().get("main")->translate(
             {
