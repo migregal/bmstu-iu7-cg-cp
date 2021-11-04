@@ -141,11 +141,19 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
     dialog_->reset();
     dialog_->show();
 
+    auto lights = std::make_shared<CGCP::drawer::LightsList>();
+    for (const auto &key : engine_->light().getKeys()) {
+        lights->push_back(engine_->light().get(key));
+    }
+
     auto fractal = engine_->fractal().get("mandelbulb");
     engine_->drawer().get("main")->setFractal(
-            engine_->camera().get("main"),
-            fractal,
-            [=](std::shared_ptr<CGCP::drawer::Image> image, double percent) -> void {
+            {engine_->camera().get("main"),
+             lights,
+             fractal,
+             ui->approximateFractal->isChecked()},
+            [=](std::shared_ptr<CGCP::drawer::Image> image, double percent)
+                    -> void {
                 static std::atomic_bool first_cancel = true;
                 if (!dialog_->wasCanceled()) {
                     emit drawer_progress(image, percent);
@@ -156,8 +164,7 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
                     first_cancel = false;
                     cancel_callback();
                 }
-            },
-            ui->approximateFractal->isChecked());
+            });
 }
 
 void MainWindow::handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent) {

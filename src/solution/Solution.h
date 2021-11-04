@@ -3,6 +3,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <vector>
 
 namespace CGCP {
     template<class T>
@@ -15,6 +16,9 @@ namespace CGCP {
         std::map<std::string, creator> creators_;
 
     public:
+        Solution() = default;
+        virtual ~Solution() = default;
+
         Solution &add(std::string key, creator c) {
             creators_[key] = c;
             return *this;
@@ -27,6 +31,11 @@ namespace CGCP {
             return items_[key];
         };
 
-        virtual ~Solution() = default;
+        std::vector<std::string> getKeys() {
+            auto keys = std::vector<std::string>();
+            for (const auto &[key, value] : creators_)
+                keys.push_back(key);
+            return keys;
+        }
     };
 }// namespace CGCP

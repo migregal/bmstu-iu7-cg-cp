@@ -20,16 +20,14 @@ namespace CGCP::drawer {
     QtDrawer::QtDrawer(QGraphicsScene *scene) : scene_(scene){};
 
     void QtDrawer::setFractal(
-            const std::shared_ptr<Camera> camera,
-            const std::shared_ptr<fractal::Fractal> fractal,
-            ProgressCallback callback,
-            bool approx) {
+            const DrawingArgs &args,
+            ProgressCallback callback) {
         if (!finished_) return;
         finished_ = false;
 
-        Drawer::setFractal(camera, fractal, callback, approx);
+        Drawer::setFractal(args, callback);
 
-        std::thread thr(&QtDrawer::drawFractal, std::ref(*this), camera, callback, approx);
+        std::thread thr(&QtDrawer::drawFractal, std::ref(*this), callback);
         run_thread_ = thr.native_handle();
         thr.detach();
     };
@@ -125,7 +123,7 @@ namespace CGCP::drawer {
                 std::clamp(color.z(), 0.0f, 1.0f));
     }
 
-    void QtDrawer::drawFractal(const std::shared_ptr<Camera> camera, ProgressCallback callback, bool approx) {
+    void QtDrawer::drawFractal(const ProgressCallback callback) {
         std::shared_ptr<Image> result;
 
         auto colors = new QColor *[scene_->width()];
@@ -140,8 +138,8 @@ namespace CGCP::drawer {
             for (size_t j = 0; j < scene_->height(); ++j) {
                 if (cancelled_) continue;
 
-                if (!approx) {
-                    QVector3D col = render(QVector2D(i, scene_->height() - j), camera->getCamera());
+                if (!approx_) {
+                    QVector3D col = render(QVector2D(i, scene_->height() - j), camera_->getCamera());
                     colors[i][j] = QColor(255 * col.x(), 255 * col.y(), 255 * col.z());
                 } else {
                     QVector3D col;
@@ -150,7 +148,7 @@ namespace CGCP::drawer {
                             col += render(
                                     QVector2D(i, scene_->height() - j) +
                                             (QVector2D(l, k) / APPROX_SQUARE_SIDE),
-                                    camera->getCamera());
+                                    camera_->getCamera());
 
                     colors[i][j] = QColor(
                             (255. * col.x()) / APPROX_SQUARE_SQUARE,
