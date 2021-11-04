@@ -10,9 +10,8 @@
 
 #include <drawer/qt/QtDrawer.h>
 
-#define PERSPECTIVE_VERTICAL_ANGLE 90
-#define PERSPECTIVE_NEAR_PLANE 0.1
-#define PERSPECTIVE_FAR_PLANE 20
+#define APPROX_SQUARE_SIDE 3.
+#define APPROX_SQUARE_SQUARE 9.
 
 const QVector3D light1 = QVector3D(0.577, 0.577, -0.577);
 const QVector3D light2 = QVector3D(-0.707, 0.000, 0.707);
@@ -23,13 +22,14 @@ namespace CGCP::drawer {
     void QtDrawer::setFractal(
             const std::shared_ptr<Camera> camera,
             const std::shared_ptr<fractal::Fractal> fractal,
-            ProgressCallback callback) {
+            ProgressCallback callback,
+            bool approx) {
         if (!finished_) return;
         finished_ = false;
 
-        Drawer::setFractal(camera, fractal, callback);
+        Drawer::setFractal(camera, fractal, callback, approx);
 
-        std::thread thr(&QtDrawer::drawFractal, std::ref(*this), camera, callback);
+        std::thread thr(&QtDrawer::drawFractal, std::ref(*this), camera, callback, approx);
         run_thread_ = thr.native_handle();
         thr.detach();
     };
@@ -44,11 +44,10 @@ namespace CGCP::drawer {
         return x * (1 - a) + y * a;
     }
 
-    static inline QVector3D refVector(QVector3D v, QVector3D n) {
-        return v;
-        // float k = QVector3D::dotProduct(v, n);
-        // //return (k>0.0) ? v : -v;
-        // return (k > 0.0) ? v : v - 2.0 * n * k;
+    static inline QVector3D refVector(QVector3D d, QVector3D n) {
+        // r = d - 2*(d*n)*n
+        float k = QVector3D::dotProduct(d, n);
+        return (k > 0.0) ? d : d - 2.0 * n * k;
     }
 
     static inline QVector3D reflect(QVector3D I, QVector3D N) {
@@ -120,10 +119,13 @@ namespace CGCP::drawer {
 
         color *= 1.0 - 0.05 * sp.length();
 
-        return color;
+        return QVector3D(
+                std::clamp(color.x(), 0.0f, 1.0f),
+                std::clamp(color.y(), 0.0f, 1.0f),
+                std::clamp(color.z(), 0.0f, 1.0f));
     }
 
-    void QtDrawer::drawFractal(const std::shared_ptr<Camera> camera, ProgressCallback callback) {
+    void QtDrawer::drawFractal(const std::shared_ptr<Camera> camera, ProgressCallback callback, bool approx) {
         std::shared_ptr<Image> result;
 
         auto colors = new QColor *[scene_->width()];
@@ -132,12 +134,29 @@ namespace CGCP::drawer {
 
         auto stop = false;
         size_t count = 0, max = scene_->width() * scene_->height() + 1;
+
 #pragma omp parallel for collapse(2) schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i) {
             for (size_t j = 0; j < scene_->height(); ++j) {
                 if (cancelled_) continue;
-                QVector3D col = render(QVector2D(i, scene_->height() - j), camera->getCamera());
-                colors[i][j] = QColor(255 * col.x(), 255 * col.y(), 255 * col.z());
+
+                if (!approx) {
+                    QVector3D col = render(QVector2D(i, scene_->height() - j), camera->getCamera());
+                    colors[i][j] = QColor(255 * col.x(), 255 * col.y(), 255 * col.z());
+                } else {
+                    QVector3D col;
+                    for (int k = 0; k < APPROX_SQUARE_SIDE; k++)
+                        for (int l = 0; l < APPROX_SQUARE_SIDE; l++)
+                            col += render(
+                                    QVector2D(i, scene_->height() - j) +
+                                            (QVector2D(l, k) / APPROX_SQUARE_SIDE),
+                                    camera->getCamera());
+
+                    colors[i][j] = QColor(
+                            (255. * col.x()) / APPROX_SQUARE_SQUARE,
+                            (255. * col.y()) / APPROX_SQUARE_SQUARE,
+                            (255. * col.z()) / APPROX_SQUARE_SQUARE);
+                }
 #pragma omp critical
                 callback(result, (double(++count) / max));
             }

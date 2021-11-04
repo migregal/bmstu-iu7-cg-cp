@@ -156,7 +156,8 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
                     first_cancel = false;
                     cancel_callback();
                 }
-            });
+            },
+            ui->approximateFractal->isChecked());
 }
 
 void MainWindow::handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent) {
