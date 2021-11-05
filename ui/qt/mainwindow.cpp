@@ -30,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     engine_ = std::make_unique<CGCP::QtEngine>(scene_);
 
+    for (const auto &key : engine_->fractal().getKeys()) {
+        ui->fractalComboBox->addItem(key.c_str());
+    }
+
     qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>(
             "std::shared_ptr<CGCP::drawer::Image>");
 
@@ -160,7 +164,8 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
     }
 
     auto color = picker_->color();
-    auto fractal = engine_->fractal().get("mandelbulb");
+    auto fractal = engine_->fractal().get(
+            ui->fractalComboBox->currentText().toStdString());
     engine_->drawer().get("main")->setFractal(
             {engine_->camera().get("main"),
              lights,

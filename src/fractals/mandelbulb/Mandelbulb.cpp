@@ -1,10 +1,16 @@
 #include <fractals/mandelbulb/Mandelbulb.h>
 
+#include <algorithm>
 #include <cmath>
 
 namespace CGCP::fractal {
 
-    float Mandelbulb::raycast(math::Vector3 const &ro, math::Vector3 const &rd, math::Vector4 &rescol, float px) {
+    float Mandelbulb::raycast(
+            math::Vector3 const &ro,
+            math::Vector3 const &rd,
+            math::Vector4 &rescol,
+            float fov,
+            math::Vector3 const &c) {
         float res = -1.0;
 
         // bounding sphere
@@ -16,12 +22,13 @@ namespace CGCP::fractal {
         // raymarch fractal distance field
         math::Vector4 trap;
 
+        float fovfactor = 1.0 / sqrt(1.0 + fov * fov);
         float t = dis.x();
-        for (int i = 0; i < 128; i++) {
+        for (int i = 0; i < 256; i++) {
             auto pos = ro + rd * t;
-            float th = 0.25 * px * t;
+            float surface = std::clamp(0.001f * t * fovfactor, 0.0f, 1e-8f);
             float h = map(pos, trap);
-            if (t > dis.y() || h < th) break;
+            if (t > dis.y() || h < surface) break;
             t += h;
         }
 
@@ -31,35 +38,6 @@ namespace CGCP::fractal {
         }
 
         return res;
-    }
-
-    math::Vector3 Mandelbulb::calcNormal(math::Vector3 &pos, float t, float px) {
-        math::Vector4 tmp;
-        // auto e = math::Vector2(1.0, -1.0) * 0.5773 * 0.25 * px;
-        auto e = math::Vector2(1.0, -1.0) * 0.5773 * 2 * px;
-        auto e_xyy = math::Vector3(e.x(), e.y(), e.y()),
-             e_yyx = math::Vector3(e.y(), e.y(), e.x()),
-             e_yxy = math::Vector3(e.y(), e.x(), e.y()),
-             e_xxx = math::Vector3(e.x(), e.x(), e.x());
-        return math::Vector3(
-                       e_xyy * map(pos + e_xyy, tmp) +
-                       e_yyx * map(pos + e_yyx, tmp) +
-                       e_yxy * map(pos + e_yxy, tmp) +
-                       e_xxx * map(pos + e_xxx, tmp))
-                .normalized();
-    }
-
-    float Mandelbulb::softshadow(math::Vector3 const &ro, math::Vector3 const &rd, float k) {
-        float res = 1.0;
-        float t = 0.0;
-        for (int i = 0; i < 64; i++) {
-            math::Vector4 kk;
-            float h = map(ro + rd * t, kk);
-            res = std::min(res, k * h / t);
-            if (res < 0.001) break;
-            t += std::clamp(h, 0.01f, 0.2f);
-        }
-        return std::clamp(res, 0.0f, 1.0f);
     }
 
     float Mandelbulb::map(math::Vector3 p, math::Vector4 &resColor) {
@@ -122,20 +100,4 @@ namespace CGCP::fractal {
         // distance estimation (through the Hubbard-Douady potential)
         return 0.25 * log(m) * sqrt(m) / dz;
     }
-
-    math::Vector2 Mandelbulb::isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd) {
-        auto oc = ro - math::Vector3(sph.x(), sph.y(), sph.z());
-
-        float b = math::Vector3::dotProduct(oc, rd);
-        float c = math::Vector3::dotProduct(oc, oc) - sph.w() * sph.w();
-
-        float h = b * b - c;
-
-        if (h < 0.0) return math::Vector2(-1.0, 0);
-
-        h = sqrt(h);
-
-        return math::Vector2(-h - b, h - b);
-    }
-
 }// namespace CGCP::fractal

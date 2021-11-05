@@ -18,21 +18,27 @@ namespace CGCP::drawer {
         return (k > 0.0) ? d : d - 2.0 * n * k;
     }
 
-    static inline math::Vector3 reflect(math::Vector3 I, math::Vector3 N) {
+    static inline math::Vector3 refovct(math::Vector3 I, math::Vector3 N) {
         return I - 2.0 * math::Vector3::dotProduct(N, I) * N;
     }
 
     math::Vector3 Drawer::render(math::Vector2 const &p, math::Matrix4x4 const &cam) {
-        const float fle = 1.5;
+        const float fov = 1.5;
+
+        auto time = 0.33;
+
+        auto cc = math::Vector3(0.9 * cos(3.9 + 1.2 * time) - .3, 0.8 * cos(2.5 + 1.1 * time), 0.8 * cos(3.4 + 1.3 * time));
+        if (cc.length() < 0.50) cc = 0.50 * cc.normalized();
+        if (cc.length() > 0.95) cc = 0.95 * cc.normalized();
 
         QVector2D sp = getScreenPos(p);
-        float px = getPx(fle);
+        float px = getPx(fov);
 
         auto ro = math::Vector3(cam.column(3));
-        auto rd = math::Vector3(cam * math::Vector4(sp.x(), sp.y(), fle, 0.0)).normalized();
+        auto rd = math::Vector3(cam * math::Vector4(sp.x(), sp.y(), fov, 0.0)).normalized();
 
         math::Vector4 tra;
-        float t = fractal_->raycast(ro, rd, tra, px);
+        float t = fractal_->raycast(ro, rd, tra, fov, cc);
 
         math::Vector3 color;
 
@@ -46,16 +52,16 @@ namespace CGCP::drawer {
                              32.0);
         } else {
             color = color_;
-            color = mix(color, {0.10, 0.20, 0.30}, std::clamp(tra.y(), 0.0f, 1.0f));
-            color = mix(color, {0.02, 0.30, 0.10}, std::clamp(tra.z() * tra.z(), 0.0f, 1.0f));
-            color = mix(color, {0.30, 0.10, 0.02}, std::clamp(pow(tra.w(), 6.0), 0.0, 1.0));
+            // color = mix(color, {0.10, 0.20, 0.30}, std::clamp(tra.y(), 0.0f, 1.0f));
+            // color = mix(color, {0.02, 0.30, 0.10}, std::clamp(tra.z() * tra.z(), 0.0f, 1.0f));
+            // color = mix(color, {0.30, 0.10, 0.02}, std::clamp(pow(tra.w(), 6.0), 0.0, 1.0));
 
             auto pos = ro + t * rd;
 
-            auto nor = fractal_->calcNormal(pos, t, px);
+            auto nor = fractal_->calcNormal(pos, t, fov, cc);
             nor = refVector(nor, -rd);
 
-            double lighting = computeLighting(pos, nor, -1. * rd, px);
+            double lighting = computeLighting(pos, nor, -1. * rd, fov, cc);
             color *= lighting;
         }
 
@@ -69,7 +75,8 @@ namespace CGCP::drawer {
             const math::Vector3 &point,
             const math::Vector3 &normal,
             const math::Vector3 &view,
-            const float px) {
+            float fov,
+            math::Vector3 const &c) {
         auto specular = 1000;
 
         if (!lights_) return 0.0;
@@ -96,15 +103,15 @@ namespace CGCP::drawer {
             }
 
             math::Vector4 tra;
-            if (fractal_->raycast(point, vec_l, tra, px) > 0) continue;
+            if (fractal_->raycast(point, vec_l, tra, fov, c) > 0) continue;
 
-            // diffuse reflection
+            // diffuse refovction
             double n_dot_l = math::Vector3::dotProduct(normal, vec_l);
             if (n_dot_l > 0)
                 intensity += light->getIntensity() * n_dot_l /
                              (length_n * vec_l.length());
 
-            // specular reflection
+            // specular refovction
             auto vec_r = normal * (2.f * math::Vector3::dotProduct(normal, vec_l)) - vec_l;
             double r_dot_v = math::Vector3::dotProduct(vec_r, view);
             if (r_dot_v > 0)
@@ -119,8 +126,8 @@ namespace CGCP::drawer {
         return point;
     }
 
-    float Drawer::getPx(float fle) {
-        return 2. / (1. * fle);
+    float Drawer::getPx(float fov) {
+        return 2. / (1. * fov);
     }
 
 }// namespace CGCP::drawer

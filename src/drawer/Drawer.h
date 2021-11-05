@@ -56,7 +56,8 @@ namespace CGCP::drawer {
                 const math::Vector3 &point,
                 const math::Vector3 &normal,
                 const math::Vector3 &view,
-                const float px);
+                float fov,
+                math::Vector3 const &c);
 
         virtual math::Vector2 getScreenPos(const math::Vector2 &point);
 

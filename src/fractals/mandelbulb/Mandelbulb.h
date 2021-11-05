@@ -5,24 +5,23 @@
 
 #include <math/Vector.h>
 
-#include <fractals/Fractal.h>
+#include <fractals/mandelbulb/MandelbulbParametrized.h>
 
 namespace CGCP::fractal {
-    class Mandelbulb : public Fractal {
+    class Mandelbulb : public MandelbulbParametrized {
     public:
         Mandelbulb() = default;
 
-        float raycast(math::Vector3 const &ro, math::Vector3 const &rd, math::Vector4 &rescol, float px) override;
-
         ~Mandelbulb() override = default;
 
-        math::Vector3 calcNormal(math::Vector3 &pos, float t, float px) override;
+        float raycast(
+                math::Vector3 const &ro,
+                math::Vector3 const &rd,
+                math::Vector4 &rescol,
+                float fov,
+                math::Vector3 const &c) override;
 
-        float softshadow(math::Vector3 const &ro, math::Vector3 const &rd, float k) override;
-
-    private:
-        math::Vector2 isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd);
-
+    protected:
         float map(math::Vector3 p, math::Vector4 &resColor);
     };
 }// namespace CGCP::fractal
