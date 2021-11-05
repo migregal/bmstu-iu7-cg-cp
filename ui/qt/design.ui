@@ -318,6 +318,20 @@
          </widget>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Время отрисовки:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="timeMeasurement">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>

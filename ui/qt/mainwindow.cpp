@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>(
             "std::shared_ptr<CGCP::drawer::Image>");
+    qRegisterMetaType<int64_t>("int64_t");
 
     keyCtrlZ = new QShortcut(this);
     keyCtrlZ->setKey(Qt::CTRL + Qt::Key_Z);
@@ -176,10 +177,11 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
              ui->approximateFractal->isChecked(),
              (float) ui->alphaSpinBox->value()},
             [=](std::shared_ptr<CGCP::drawer::Image> image,
-                double percent) -> void {
+                double percent,
+                int64_t time) -> void {
                 static std::atomic_bool first_cancel = true;
                 if (!dialog_->wasCanceled()) {
-                    emit drawer_progress(image, percent);
+                    emit drawer_progress(image, percent, time);
                     return;
                 }
 
@@ -192,7 +194,8 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
 
 void MainWindow::handle_drawer_progress(
         std::shared_ptr<CGCP::drawer::Image> image,
-        double percent) {
+        double percent,
+        int64_t time) {
     if (dialog_->wasCanceled()) return;
 
     dialog_->setValue(percent * 100);
@@ -203,6 +206,8 @@ void MainWindow::handle_drawer_progress(
     if (image) {
         scene_->clear();
         engine_->drawer().get("main")->setImage(image);
+
+        ui->timeMeasurement->setText(QString::number(time, 'e', 2) + " [µs]");
     }
 }
 

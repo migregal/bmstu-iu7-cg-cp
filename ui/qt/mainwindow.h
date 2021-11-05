@@ -26,12 +26,12 @@ public:
     ~MainWindow() override;
 
 signals:
-    void drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent);
+    void drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent, int64_t time);
 
     void cancel_drawer();
 
 private slots:
-    void handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent);
+    void handle_drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent, int64_t time);
 
     void handle_cancel_drawer();
 

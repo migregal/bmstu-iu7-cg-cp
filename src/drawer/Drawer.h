@@ -30,7 +30,9 @@ namespace CGCP::drawer {
     class Drawer {
     public:
         using ProgressCallback = std::function<void(
-                std::shared_ptr<Image> image, double percent)>;
+                std::shared_ptr<Image> image,
+                double percent,
+                int64_t time)>;
 
         virtual void setFractal(
                 const DrawingArgs &args,

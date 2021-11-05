@@ -1,3 +1,4 @@
+#include <chrono>
 #include <thread>
 
 #include <QDebug>
@@ -52,6 +53,8 @@ namespace CGCP::drawer {
         auto stop = false;
         size_t count = 0, max = scene_->width() * scene_->height() + 1;
 
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 #pragma omp parallel for collapse(2) schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i) {
             for (size_t j = 0; j < scene_->height(); ++j) {
@@ -75,9 +78,11 @@ namespace CGCP::drawer {
                             (255. * col.z()) / APPROX_SQUARE_SQUARE);
                 }
 #pragma omp critical
-                callback(result, (double(++count) / max));
+                callback(result, (double(++count) / max), 0);
             }
         }
+
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
         if (!cancelled_) {
             result = std::make_shared<QImage>(scene_->width(), scene_->height(), QImage::Format_RGB32);
@@ -92,7 +97,10 @@ namespace CGCP::drawer {
 
         finished_ = true;
 
-        callback(result, 1);
+        callback(
+                result,
+                1,
+                std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count());
     }
 
     void QtDrawer::cancel() {
