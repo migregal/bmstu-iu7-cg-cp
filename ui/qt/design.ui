@@ -49,10 +49,10 @@
            <string>Построение</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="3" column="2">
-            <widget class="QCheckBox" name="approximateFractal">
+           <item row="4" column="2">
+            <widget class="QLabel" name="label_12">
              <property name="text">
-              <string>Аппроксимация</string>
+              <string>Альфа</string>
              </property>
             </widget>
            </item>
@@ -87,20 +87,27 @@
              </layout>
             </widget>
            </item>
-           <item row="4" column="2">
-            <widget class="QPushButton" name="buildImageButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+           <item row="4" column="3">
+            <widget class="QDoubleSpinBox" name="alphaSpinBox">
+             <property name="decimals">
+              <number>4</number>
              </property>
-             <property name="text">
-              <string>Построить</string>
+             <property name="maximum">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="stepType">
+              <enum>QAbstractSpinBox::DefaultStepType</enum>
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
+           <item row="3" column="2" colspan="2">
+            <widget class="QCheckBox" name="approximateFractal">
+             <property name="text">
+              <string>Аппроксимация</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2" colspan="2">
             <widget class="QFrame" name="frame_2">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -132,6 +139,19 @@
                <widget class="QComboBox" name="fractalComboBox"/>
               </item>
              </layout>
+            </widget>
+           </item>
+           <item row="5" column="2" colspan="2">
+            <widget class="QPushButton" name="buildImageButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Построить</string>
+             </property>
             </widget>
            </item>
           </layout>

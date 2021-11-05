@@ -22,16 +22,16 @@ namespace CGCP::drawer {
         return I - 2.0 * math::Vector3::dotProduct(N, I) * N;
     }
 
-    math::Vector3 Drawer::render(math::Vector2 const &p, math::Matrix4x4 const &cam) {
+    math::Vector3 Drawer::render(math::Vector2 const &pos, math::Matrix4x4 const &cam) {
         const float fov = 1.5;
 
-        auto time = 0.33;
-
-        auto cc = math::Vector3(0.9 * cos(3.9 + 1.2 * time) - .3, 0.8 * cos(2.5 + 1.1 * time), 0.8 * cos(3.4 + 1.3 * time));
+        auto cc = math::Vector3(0.9 * cos(3.9 + 1.2 * alpha_) - .3,
+                                0.8 * cos(2.5 + 1.1 * alpha_),
+                                0.8 * cos(3.4 + 1.3 * alpha_));
         if (cc.length() < 0.50) cc = 0.50 * cc.normalized();
         if (cc.length() > 0.95) cc = 0.95 * cc.normalized();
 
-        QVector2D sp = getScreenPos(p);
+        QVector2D sp = getScreenPos(pos);
         float px = getPx(fov);
 
         auto ro = math::Vector3(cam.column(3));

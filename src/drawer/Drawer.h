@@ -21,6 +21,7 @@ namespace CGCP::drawer {
         const std::shared_ptr<fractal::Fractal> fractal;
         const math::Vector3 &color;
         const bool approx;
+        const float alpha;
     };
 
     using Image = QImage;
@@ -39,6 +40,7 @@ namespace CGCP::drawer {
             fractal_ = args.fractal;
             color_ = args.color;
             approx_ = args.approx;
+            alpha_ = args.alpha;
         };
 
         virtual void cancel() = 0;
@@ -69,5 +71,6 @@ namespace CGCP::drawer {
         std::shared_ptr<fractal::Fractal> fractal_;
         math::Vector3 color_;
         bool approx_;
+        float alpha_;
     };
 }// namespace CGCP::drawer

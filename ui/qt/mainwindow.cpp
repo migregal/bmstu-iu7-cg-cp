@@ -173,7 +173,8 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
              {(float) color.red() / 255.f,
               (float) color.green() / 255.f,
               (float) color.blue() / 255.f},
-             ui->approximateFractal->isChecked()},
+             ui->approximateFractal->isChecked(),
+             (float) ui->alphaSpinBox->value()},
             [=](std::shared_ptr<CGCP::drawer::Image> image,
                 double percent) -> void {
                 static std::atomic_bool first_cancel = true;
