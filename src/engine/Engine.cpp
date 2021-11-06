@@ -1,7 +1,7 @@
 #include <engine/Engine.h>
 
+#include <fractals/julia/Julia.h>
 #include <fractals/mandelbulb/Mandelbulb.h>
-#include <fractals/mandelbulb/MandelbulbParametrized.h>
 
 namespace CGCP {
     Engine::Engine() : camera_(std::make_unique<CameraSolution>()),
@@ -12,7 +12,7 @@ namespace CGCP {
             return std::make_unique<Camera>();
         });
         fractal().add("mandelbulb parametrized", [=]() -> std::unique_ptr<fractal::Fractal> {
-            return std::make_unique<fractal::MandelbulbParametrized>();
+            return std::make_unique<fractal::JuliaParametrized>();
         });
         fractal().add("mandelbulb", [=]() -> std::unique_ptr<fractal::Fractal> {
             return std::make_unique<fractal::Mandelbulb>();

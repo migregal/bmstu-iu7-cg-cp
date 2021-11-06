@@ -65,8 +65,6 @@ namespace CGCP::drawer {
 
         virtual math::Vector2 getScreenPos(const math::Vector2 &point);
 
-        virtual float getPx(float fle);
-
     protected:
         std::shared_ptr<Camera> camera_;
         std::shared_ptr<LightsList> lights_;

@@ -8,11 +8,11 @@
 #include <fractals/Fractal.h>
 
 namespace CGCP::fractal {
-    class MandelbulbParametrized : public Fractal {
+    class JuliaParametrized : public Fractal {
     public:
-        MandelbulbParametrized() = default;
+        JuliaParametrized() = default;
 
-        ~MandelbulbParametrized() override = default;
+        ~JuliaParametrized() override = default;
 
         // float raycast(math::Vector3 const &ro, math::Vector3 const &rd, math::Vector4 &rescol, float px) override;
 

@@ -27,8 +27,6 @@ namespace CGCP::drawer {
     protected:
         math::Vector2 getScreenPos(const math::Vector2 &point) override;
 
-        float getPx(float fle) override;
-
     private:
         void drawFractal(ProgressCallback callback);
 

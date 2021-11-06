@@ -1,4 +1,4 @@
-#include <fractals/mandelbulb/MandelbulbParametrized.h>
+#include <fractals/julia/Julia.h>
 
 #include <algorithm>
 #include <cmath>
@@ -8,7 +8,7 @@
 #include <QDebug>
 namespace CGCP::fractal {
 
-    float MandelbulbParametrized::raycast(
+    float JuliaParametrized::raycast(
             math::Vector3 const &ro,
             math::Vector3 const &rd,
             math::Vector4 &rescol,
@@ -43,10 +43,10 @@ namespace CGCP::fractal {
         return res;
     }
 
-    math::Vector3 MandelbulbParametrized::calcNormal(math::Vector3 &pos,
-                                                     float t,
-                                                     float fovfactor,
-                                                     const math::Vector3 &c) {
+    math::Vector3 JuliaParametrized::calcNormal(math::Vector3 &pos,
+                                                float t,
+                                                float fovfactor,
+                                                const math::Vector3 &c) {
         math::Vector4 tmp;
         float surface = std::clamp(0.0005f * t * fovfactor, 0.0f, 0.1f);
         auto eps = math::Vector2(surface, 0.0);
@@ -61,7 +61,7 @@ namespace CGCP::fractal {
                 .normalized();
     }
 
-    float MandelbulbParametrized::map(const math::Vector3 &p, const math::Vector3 &c, math::Vector4 &resColor) {
+    float JuliaParametrized::map(const math::Vector3 &p, const math::Vector3 &c, math::Vector4 &resColor) {
         math::Vector3 z = p;
         float m = math::Vector3::dotProduct(z, z);
 
@@ -99,7 +99,7 @@ namespace CGCP::fractal {
         return 0.25 * log(m) * sqrt(m) / dz;
     }
 
-    math::Vector2 MandelbulbParametrized::boundigRect(
+    math::Vector2 JuliaParametrized::boundigRect(
             math::Vector3 const &lb,
             math::Vector3 const &rt,
             math::Vector3 const &ro,
@@ -130,7 +130,7 @@ namespace CGCP::fractal {
         return {tmin, tmax};
     }
 
-    math::Vector2 MandelbulbParametrized::isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd) {
+    math::Vector2 JuliaParametrized::isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd) {
         auto oc = ro - math::Vector3(sph.x(), sph.y(), sph.z());
 
         float b = math::Vector3::dotProduct(oc, rd);

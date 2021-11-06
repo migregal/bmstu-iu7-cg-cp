@@ -5,10 +5,10 @@
 
 #include <math/Vector.h>
 
-#include <fractals/mandelbulb/MandelbulbParametrized.h>
+#include <fractals/julia/Julia.h>
 
 namespace CGCP::fractal {
-    class Mandelbulb : public MandelbulbParametrized {
+    class Mandelbulb : public JuliaParametrized {
     public:
         Mandelbulb() = default;
 

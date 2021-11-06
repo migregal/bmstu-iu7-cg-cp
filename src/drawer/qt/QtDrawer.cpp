@@ -39,10 +39,6 @@ namespace CGCP::drawer {
                scene_->height();
     }
 
-    float QtDrawer::getPx(float fle) {
-        return 2.0 / (scene_->height() * fle);
-    }
-
     void QtDrawer::drawFractal(const ProgressCallback callback) {
         std::shared_ptr<Image> result;
 

@@ -50,8 +50,8 @@ set(FRACTALS
         src/fractals/mandelbulb/Mandelbulb.h
         src/fractals/mandelbulb/Mandelbulb.cpp
 
-        src/fractals/mandelbulb/MandelbulbParametrized.h
-        src/fractals/mandelbulb/MandelbulbParametrized.cpp
+        src/fractals/julia/Julia.h
+        src/fractals/julia/Julia.cpp
 
         # src/fractals/julia/Julia.h
         # src/fractals/julia/Julia.cpp

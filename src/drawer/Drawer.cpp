@@ -32,7 +32,6 @@ namespace CGCP::drawer {
         if (cc.length() > 0.95) cc = 0.95 * cc.normalized();
 
         QVector2D sp = getScreenPos(pos);
-        float px = getPx(fov);
 
         auto ro = math::Vector3(cam.column(3));
         auto rd = math::Vector3(cam * math::Vector4(sp.x(), sp.y(), fov, 0.0)).normalized();
@@ -125,9 +124,4 @@ namespace CGCP::drawer {
     math::Vector2 Drawer::getScreenPos(const math::Vector2 &point) {
         return point;
     }
-
-    float Drawer::getPx(float fov) {
-        return 2. / (1. * fov);
-    }
-
 }// namespace CGCP::drawer
