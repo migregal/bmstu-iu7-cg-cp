@@ -13,8 +13,8 @@ namespace CGCP::fractal {
             math::Vector3 const &c) {
         float res = -1.0;
 
-        // bounding sphere
-        auto dis = isphere(math::Vector4(0.0, 0.0, 0.0, 1.25), ro, rd);
+        auto dis = boundigRect({-1, -1, -1}, {1, 1, 1}, ro, rd);
+
         if (dis.y() < 0.0) return -1.0;
         dis.setX(std::max(dis.x(), 0.0f));
         dis.setY(std::min(dis.y(), 10.0f));

@@ -5,6 +5,7 @@
 
 #include <math/Vector.h>
 
+#include <QDebug>
 namespace CGCP::fractal {
 
     float MandelbulbParametrized::raycast(
@@ -15,8 +16,8 @@ namespace CGCP::fractal {
             math::Vector3 const &c) {
         float res = -1.0;
 
-        // bounding sphere
-        auto dis = isphere(math::Vector4(0.0, 0.0, 0.0, 1.25), ro, rd);
+        auto dis = boundigRect({-1, -1, -1}, {1, 1, 1}, ro, rd);
+
         if (dis.y() < 0.0) return -1.0;
         dis.setX(std::max(dis.x(), 0.0f));
 
@@ -96,6 +97,37 @@ namespace CGCP::fractal {
 
         // distance estimation (through the Hubbard-Douady potential)
         return 0.25 * log(m) * sqrt(m) / dz;
+    }
+
+    math::Vector2 MandelbulbParametrized::boundigRect(
+            math::Vector3 const &lb,
+            math::Vector3 const &rt,
+            math::Vector3 const &ro,
+            math::Vector3 const &rd) {
+        // rd is unit direction vector of ray
+        auto dirfrac = math::Vector3(1.0f / rd.x(),
+                                     1.0f / rd.y(),
+                                     1.0f / rd.z());
+        // lb is the corner of AABB with minimal coordinates - left bottom
+        // rt is maximal corner
+        // ro is origin of ray
+        float t1 = (lb.x() - ro.x()) * dirfrac.x();
+        float t2 = (rt.x() - ro.x()) * dirfrac.x();
+        float t3 = (lb.y() - ro.y()) * dirfrac.y();
+        float t4 = (rt.y() - ro.y()) * dirfrac.y();
+        float t5 = (lb.z() - ro.z()) * dirfrac.z();
+        float t6 = (rt.z() - ro.z()) * dirfrac.z();
+
+        float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+        float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+
+        // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+        if (tmax < 0) return {-1, -1};
+
+        // if tmin > tmax, ray doesn't intersect AABB
+        if (tmin > tmax) return {-1, -1};
+
+        return {tmin, tmax};
     }
 
     math::Vector2 MandelbulbParametrized::isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd) {
