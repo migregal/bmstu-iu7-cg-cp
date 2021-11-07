@@ -49,6 +49,8 @@ protected:
 
     void on_ctrl_shift_z_pressed();
 
+    void on_fractal_changed(int i);
+
     void resizeEvent(QResizeEvent *event) override;
 
 private:

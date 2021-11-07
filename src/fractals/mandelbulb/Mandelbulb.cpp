@@ -13,7 +13,7 @@ namespace CGCP::fractal {
             math::Vector3 const &c) {
         float res = -1.0;
 
-        auto dis = boundigRect({-1, -1, -1}, {1, 1, 1}, ro, rd);
+        auto dis = bounder_->intersect(ro, rd);
 
         if (dis.y() < 0.0) return -1.0;
         dis.setX(std::max(dis.x(), 0.0f));

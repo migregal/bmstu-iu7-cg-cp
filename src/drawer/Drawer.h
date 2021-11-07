@@ -4,9 +4,9 @@
 
 #include <QImage>
 
-#include <math/Matrix.h>
-#include <math/Vector.h>
+#include <bounders/aabb/AABB.h>
 
+#include <math/Matrix.h>
 #include <math/Vector.h>
 
 #include <camera/Camera.h>
@@ -29,6 +29,9 @@ namespace CGCP::drawer {
 
     class Drawer {
     public:
+        Drawer() = default;
+        virtual ~Drawer() = default;
+
         using ProgressCallback = std::function<void(
                 std::shared_ptr<Image> image,
                 double percent,
@@ -48,8 +51,6 @@ namespace CGCP::drawer {
         virtual void cancel() = 0;
 
         virtual void setImage(const std::shared_ptr<Image> image) = 0;
-
-        virtual ~Drawer() = default;
 
     protected:
         math::Vector3 render(

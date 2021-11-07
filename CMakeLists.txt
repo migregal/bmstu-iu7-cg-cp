@@ -21,6 +21,13 @@ set(QT_GUI
         ui/qt/widgets/ColorPicker.cpp
         )
 
+set(BOUNDER
+        src/bounders/Bounder.h
+
+        src/bounders/aabb/AABB.h
+        src/bounders/aabb/AABB.cpp
+)
+
 set(CAMERA
         src/camera/Camera.h
         src/camera/Camera.cpp
@@ -46,6 +53,7 @@ set(ENGINE
 
 set(FRACTALS
         src/fractals/Fractal.h
+        src/fractals/Fractal.cpp
 
         src/fractals/mandelbulb/Mandelbulb.h
         src/fractals/mandelbulb/Mandelbulb.cpp
@@ -69,6 +77,7 @@ set(MATH
 
 add_executable(${PROJECT_NAME}
         ${QT_GUI}
+        ${BOUNDER}
         ${CAMERA}
         ${DRAWER}
         ${ENGINE}

@@ -15,6 +15,8 @@
 namespace CGCP::drawer {
     QtDrawer::QtDrawer(QGraphicsScene *scene) : scene_(scene){};
 
+    QtDrawer::~QtDrawer() { cancel(); }
+
     void QtDrawer::setFractal(
             const DrawingArgs &args,
             ProgressCallback callback) {
@@ -47,11 +49,11 @@ namespace CGCP::drawer {
             colors[i] = new QColor[scene_->height()];
 
         auto stop = false;
-        size_t count = 0, max = scene_->width() * scene_->height() + 1;
+        size_t count = 0, max = scene_->width() + 1;
 
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-#pragma omp parallel for collapse(2) schedule(dynamic)
+#pragma omp parallel for schedule(dynamic)
         for (size_t i = 0; i < scene_->width(); ++i) {
             for (size_t j = 0; j < scene_->height(); ++j) {
                 if (cancelled_) continue;
@@ -73,9 +75,9 @@ namespace CGCP::drawer {
                             (255. * col.y()) / APPROX_SQUARE_SQUARE,
                             (255. * col.z()) / APPROX_SQUARE_SQUARE);
                 }
-#pragma omp critical
-                callback(result, (double(++count) / max), 0);
             }
+#pragma omp critical
+            callback(result, (double(++count) / max), 0);
         }
 
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();

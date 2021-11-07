@@ -44,55 +44,29 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
         ui->fractalComboBox->addItem(key.c_str());
     }
 
-    qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>(
-            "std::shared_ptr<CGCP::drawer::Image>");
+    qRegisterMetaType<std::shared_ptr<CGCP::drawer::Image>>("std::shared_ptr<CGCP::drawer::Image>");
     qRegisterMetaType<int64_t>("int64_t");
 
     keyCtrlZ = new QShortcut(this);
     keyCtrlZ->setKey(Qt::CTRL + Qt::Key_Z);
-    connect(
-            keyCtrlZ,
-            &QShortcut::activated,
-            this,
-            &MainWindow::on_ctrl_z_pressed);
+    connect(keyCtrlZ, &QShortcut::activated, this, &MainWindow::on_ctrl_z_pressed);
 
     keyCtrlShiftZ = new QShortcut(this);
     keyCtrlShiftZ->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
-    connect(
-            keyCtrlShiftZ,
-            &QShortcut::activated,
-            this,
-            &MainWindow::on_ctrl_shift_z_pressed);
+    connect(keyCtrlShiftZ, &QShortcut::activated, this, &MainWindow::on_ctrl_shift_z_pressed);
 
-    connect(
-            ui->buildImageButton,
-            &QPushButton::clicked,
-            this,
-            &MainWindow::on_apply_clicked);
+    connect(ui->buildImageButton, &QPushButton::clicked, this, &MainWindow::on_apply_clicked);
 
-    connect(
-            ui->rotationApply,
-            &QPushButton::clicked,
-            this,
-            &MainWindow::on_rotation_apply_clicked);
+    connect(ui->rotationApply, &QPushButton::clicked, this, &MainWindow::on_rotation_apply_clicked);
 
-    connect(
-            ui->translationApply,
-            &QPushButton::clicked,
-            this,
-            &MainWindow::on_translation_apply_clicked);
+    connect(ui->translationApply, &QPushButton::clicked, this, &MainWindow::on_translation_apply_clicked);
 
-    connect(
-            this,
-            &MainWindow::drawer_progress,
-            this,
-            &MainWindow::handle_drawer_progress);
+    connect(this, &MainWindow::drawer_progress, this, &MainWindow::handle_drawer_progress);
 
-    connect(
-            this->dialog_,
-            &QProgressDialog::canceled,
-            this,
-            &MainWindow::handle_cancel_drawer);
+    connect(dialog_, &QProgressDialog::canceled, this, &MainWindow::handle_cancel_drawer);
+
+    connect(ui->fractalComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::on_fractal_changed);
 }
 
 void MainWindow::on_apply_clicked() {
@@ -154,6 +128,13 @@ void MainWindow::on_ctrl_shift_z_pressed() {
     });
 }
 
+void MainWindow::on_fractal_changed(int i) {
+    auto parametrized = 0 == i;
+
+    ui->alphaSpinBox->setVisible(parametrized);
+    ui->alphaLabel->setVisible(parametrized);
+}
+
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
 
@@ -175,19 +156,26 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
     for (const auto &key : engine_->light().getKeys()) {
         lights->push_back(engine_->light().get(key));
     }
-
-    auto color = picker_->color();
     auto fractal = engine_->fractal().get(
             ui->fractalComboBox->currentText().toStdString());
+    fractal->setBounder(std::shared_ptr<CGCP::bounder::Bounder>(
+            new CGCP::bounder::AABB(
+                    {(float) ui->bottom_x->value(), (float) ui->bottom_y->value(), (float) ui->bottom_z->value()},
+                    {(float) ui->upper_x->value(), (float) ui->upper_y->value(), (float) ui->upper_z->value()})));
+
+    auto color = picker_->color();
+    auto args = CGCP::drawer::DrawingArgs{
+            engine_->camera().get("main"),
+            lights,
+            fractal,
+            {(float) color.red() / 255.f,
+             (float) color.green() / 255.f,
+             (float) color.blue() / 255.f},
+            ui->approximateFractal->isChecked(),
+            (float) ui->alphaSpinBox->value()};
+
     engine_->drawer().get("main")->setFractal(
-            {engine_->camera().get("main"),
-             lights,
-             fractal,
-             {(float) color.red() / 255.f,
-              (float) color.green() / 255.f,
-              (float) color.blue() / 255.f},
-             ui->approximateFractal->isChecked(),
-             (float) ui->alphaSpinBox->value()},
+            args,
             [=](std::shared_ptr<CGCP::drawer::Image> image,
                 double percent,
                 int64_t time) -> void {

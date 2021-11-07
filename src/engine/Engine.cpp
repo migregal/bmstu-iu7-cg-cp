@@ -11,7 +11,7 @@ namespace CGCP {
         camera().add("main", [=]() -> std::unique_ptr<Camera> {
             return std::make_unique<Camera>();
         });
-        fractal().add("mandelbulb parametrized", [=]() -> std::unique_ptr<fractal::Fractal> {
+        fractal().add("julia", [=]() -> std::unique_ptr<fractal::Fractal> {
             return std::make_unique<fractal::JuliaParametrized>();
         });
         fractal().add("mandelbulb", [=]() -> std::unique_ptr<fractal::Fractal> {

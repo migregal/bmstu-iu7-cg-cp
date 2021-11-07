@@ -12,6 +12,9 @@ namespace CGCP::drawer {
     class QtDrawer : public Drawer {
     public:
         QtDrawer() = delete;
+
+        ~QtDrawer() override;
+
         explicit QtDrawer(QGraphicsScene *scene);
 
         virtual void setFractal(
@@ -21,8 +24,6 @@ namespace CGCP::drawer {
         virtual void cancel() override;
 
         virtual void setImage(const std::shared_ptr<Image> image) override;
-
-        virtual ~QtDrawer() override = default;
 
     protected:
         math::Vector2 getScreenPos(const math::Vector2 &point) override;
