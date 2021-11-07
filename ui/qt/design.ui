@@ -49,10 +49,16 @@
            <string>Построение</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="4" column="2">
-            <widget class="QLabel" name="label_12">
+           <item row="5" column="2" colspan="2">
+            <widget class="QPushButton" name="buildImageButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
-              <string>Альфа</string>
+              <string>Построить</string>
              </property>
             </widget>
            </item>
@@ -100,6 +106,13 @@
              </property>
             </widget>
            </item>
+           <item row="4" column="2">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Альфа</string>
+             </property>
+            </widget>
+           </item>
            <item row="3" column="2" colspan="2">
             <widget class="QCheckBox" name="approximateFractal">
              <property name="text">
@@ -139,19 +152,6 @@
                <widget class="QComboBox" name="fractalComboBox"/>
               </item>
              </layout>
-            </widget>
-           </item>
-           <item row="5" column="2" colspan="2">
-            <widget class="QPushButton" name="buildImageButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Построить</string>
-             </property>
             </widget>
            </item>
           </layout>
@@ -316,20 +316,6 @@
            </item>
           </layout>
          </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>Время отрисовки:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="timeMeasurement">
-         <property name="text">
-          <string/>
-         </property>
         </widget>
        </item>
       </layout>

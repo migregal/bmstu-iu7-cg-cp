@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow {
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+    ~MainWindow() = default;
 
 signals:
     void drawer_progress(std::shared_ptr<CGCP::drawer::Image> image, double percent, int64_t time);
@@ -48,13 +48,17 @@ protected:
     void on_ctrl_z_pressed();
 
     void on_ctrl_shift_z_pressed();
-    // void resizeEvent(QResizeEvent *event) override;
+
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
 
     QGraphicsScene *scene_;
+
     QProgressDialog *dialog_;
+
+    QLabel *time_label_, *scene_resolution_label_;
 
     ColorPicker *picker_;
 

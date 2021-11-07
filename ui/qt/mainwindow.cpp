@@ -24,6 +24,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    scene_resolution_label_ = new QLabel("Разрешение сцены:");
+    ui->statusbar->addPermanentWidget(scene_resolution_label_);
+    scene_resolution_label_ = new QLabel();
+    ui->statusbar->addPermanentWidget(scene_resolution_label_);
+
+    time_label_ = new QLabel("Время отрисовки:");
+    ui->statusbar->addPermanentWidget(time_label_);
+    time_label_ = new QLabel();
+    ui->statusbar->addPermanentWidget(time_label_);
+
     picker_ = new ColorPicker(this, {120, 120, 120}, "Выбор цвета");
 
     ui->color_frame->layout()->addWidget(picker_);
@@ -85,14 +95,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
             &MainWindow::handle_cancel_drawer);
 }
 
-MainWindow::~MainWindow() {
-    delete ui;
-    delete scene_;
-    delete dialog_;
-    delete keyCtrlZ;
-    delete keyCtrlShiftZ;
-}
-
 void MainWindow::on_apply_clicked() {
     update_scene(nullptr);
 }
@@ -152,6 +154,16 @@ void MainWindow::on_ctrl_shift_z_pressed() {
     });
 }
 
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
+
+    auto rcontent = ui->graphicsView->contentsRect();
+    scene_resolution_label_->setText(
+            QString::number(rcontent.width()) +
+            ";" +
+            QString::number(rcontent.height()));
+}
+
 void MainWindow::update_scene(std::function<void()> cancel_callback) {
     auto rcontent = ui->graphicsView->contentsRect();
     scene_->setSceneRect(0, 0, rcontent.width(), rcontent.height());
@@ -206,8 +218,7 @@ void MainWindow::handle_drawer_progress(
     if (image) {
         scene_->clear();
         engine_->drawer().get("main")->setImage(image);
-
-        ui->timeMeasurement->setText(QString::number(time, 'e', 2) + " [µs]");
+        time_label_->setText(QString::number(time, 'e', 2) + " [µs]");
     }
 }
 
