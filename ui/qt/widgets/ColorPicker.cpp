@@ -55,6 +55,6 @@ void ColorPicker::paintEvent(QPaintEvent *) {
 
 void ColorPicker::_setBackColor() {
     QString _color = mColor.name(QColor::HexRgb);
-    QString _styleSheet = QString("background-color: %1;").arg(_color);
+    QString _styleSheet = QString("background-color: %1;border: 1px solid black;").arg(_color);
     QWidget::setStyleSheet(_styleSheet);
 }
