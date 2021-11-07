@@ -98,19 +98,4 @@ namespace CGCP::fractal {
         // distance estimation (through the Hubbard-Douady potential)
         return 0.25 * log(m) * sqrt(m) / dz;
     }
-
-    math::Vector2 JuliaParametrized::isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd) {
-        auto oc = ro - math::Vector3(sph.x(), sph.y(), sph.z());
-
-        float b = math::Vector3::dotProduct(oc, rd);
-        float c = math::Vector3::dotProduct(oc, oc) - sph.w() * sph.w();
-
-        float h = b * b - c;
-
-        if (h < 0.0) return math::Vector2(-1.0, -1.0);
-
-        h = sqrt(h);
-
-        return math::Vector2(-h - b, h - b);
-    }
 }// namespace CGCP::fractal

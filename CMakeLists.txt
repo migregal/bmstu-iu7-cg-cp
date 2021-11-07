@@ -26,6 +26,9 @@ set(BOUNDER
 
         src/bounders/aabb/AABB.h
         src/bounders/aabb/AABB.cpp
+
+        src/bounders/sphere/Sphere.h
+        src/bounders/sphere/Sphere.cpp
 )
 
 set(CAMERA

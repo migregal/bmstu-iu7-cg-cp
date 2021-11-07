@@ -31,8 +31,6 @@ namespace CGCP::fractal {
                                  const math::Vector3 &c) override;
 
     protected:
-        virtual math::Vector2 isphere(math::Vector4 const &sph, math::Vector3 const &ro, math::Vector3 const &rd);
-
         float map(const math::Vector3 &p, const math::Vector3 &c, math::Vector4 &resColor);
     };
 }// namespace CGCP::fractal
