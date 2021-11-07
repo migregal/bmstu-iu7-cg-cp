@@ -1,5 +1,3 @@
-#pragma once
-
 #include <fractals/Fractal.h>
 
 namespace CGCP::fractal {
