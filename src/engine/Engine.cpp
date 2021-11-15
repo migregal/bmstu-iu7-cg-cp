@@ -29,5 +29,11 @@ namespace CGCP {
                     0.7,
                     light::LightType::Directional);
         });
+        light().add("positioned", []() -> std::unique_ptr<light::LightSource> {
+            return std::make_unique<light::LightSource>(
+                    math::Vector3(0, 0, 0),
+                    0.0,
+                    light::LightType::Point);
+        });
     };
 }// namespace CGCP

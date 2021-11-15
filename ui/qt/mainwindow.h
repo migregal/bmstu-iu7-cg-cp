@@ -45,6 +45,8 @@ protected:
 
     void on_translation_apply_clicked();
 
+    void on_light_applied();
+
     void on_ctrl_z_pressed();
 
     void on_ctrl_shift_z_pressed();

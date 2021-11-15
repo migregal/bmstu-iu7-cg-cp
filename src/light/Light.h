@@ -15,7 +15,11 @@ namespace CGCP::light {
 
         LightType getType();
 
+        void setPosition(const math::Vector3 &position);
+
         math::Vector3 getPosition();
+
+        void setIntensivity(double intensivity);
 
         double getIntensity();
 

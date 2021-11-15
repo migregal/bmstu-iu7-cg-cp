@@ -35,8 +35,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->statusbar->addPermanentWidget(time_label_);
 
     picker_ = new ColorPicker(this, {120, 120, 120}, "Выбор цвета");
-
-    ui->color_frame->layout()->addWidget(picker_);
+    ui->material_frame->layout()->addWidget(picker_);
 
     engine_ = std::make_unique<CGCP::QtEngine>(scene_);
 
@@ -60,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     connect(ui->rotationApply, &QPushButton::clicked, this, &MainWindow::on_rotation_apply_clicked);
 
     connect(ui->translationApply, &QPushButton::clicked, this, &MainWindow::on_translation_apply_clicked);
+
+    connect(ui->applyLightButton, &QPushButton::clicked, this, &MainWindow::on_light_applied);
 
     connect(this, &MainWindow::drawer_progress, this, &MainWindow::handle_drawer_progress);
 
@@ -102,6 +103,25 @@ void MainWindow::on_translation_apply_clicked() {
     update_scene([this]() -> void {
         engine_->camera().get("main")->setCamera(stack_backward_.pop());
     });
+}
+
+void MainWindow::on_light_applied() {
+    engine_->light().get("ambient")->setIntensivity(
+            ui->ambientLightIntensity->value());
+    engine_->light().get("directed")->setIntensivity(ui->directedLightIntensity->value());
+    engine_->light().get("directed")->setPosition({
+            (float) ui->directedLightX->value(),
+            (float) ui->directedLightY->value(),
+            (float) ui->directedLightZ->value(),
+    });
+    engine_->light().get("positioned")->setIntensivity(ui->positionedLightIntensity->value());
+    engine_->light().get("positioned")->setPosition({
+            (float) ui->positionedLightX->value(),
+            (float) ui->positionedLightY->value(),
+            (float) ui->positionedLightZ->value(),
+    });
+
+    on_apply_clicked();
 }
 
 void MainWindow::on_ctrl_z_pressed() {
