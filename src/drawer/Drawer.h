@@ -15,11 +15,11 @@
 
 namespace CGCP::drawer {
     using LightsList = std::vector<std::shared_ptr<light::LightSource>>;
+
     struct DrawingArgs {
         const std::shared_ptr<Camera> camera;
         const std::shared_ptr<LightsList> lights;
         const std::shared_ptr<fractal::Fractal> fractal;
-        const math::Vector3 &color;
         const bool approx;
         const float alpha;
     };
@@ -43,7 +43,6 @@ namespace CGCP::drawer {
             camera_ = args.camera;
             lights_ = args.lights;
             fractal_ = args.fractal;
-            color_ = args.color;
             approx_ = args.approx;
             alpha_ = args.alpha;
         };
@@ -70,7 +69,6 @@ namespace CGCP::drawer {
         std::shared_ptr<Camera> camera_;
         std::shared_ptr<LightsList> lights_;
         std::shared_ptr<fractal::Fractal> fractal_;
-        math::Vector3 color_;
         bool approx_;
         float alpha_;
     };

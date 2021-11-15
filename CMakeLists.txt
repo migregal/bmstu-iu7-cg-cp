@@ -73,6 +73,11 @@ set(LIGHT
         src/light/Light.cpp
         )
 
+set(MATERIAL
+        src/material/Material.h
+        src/material/Material.cpp
+        )
+
 set(MATH
         src/math/Matrix.h
         src/math/Vector.h
@@ -86,6 +91,7 @@ add_executable(${PROJECT_NAME}
         ${ENGINE}
         ${FRACTALS}
         ${LIGHT}
+        ${MATERIAL}
         ${MATH}
         main.cpp
         )

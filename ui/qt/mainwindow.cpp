@@ -163,14 +163,20 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
                     {(float) ui->bottom_x->value(), (float) ui->bottom_y->value(), (float) ui->bottom_z->value()},
                     {(float) ui->upper_x->value(), (float) ui->upper_y->value(), (float) ui->upper_z->value()})));
 
-    auto color = picker_->color();
+    auto color = CGCP::math::Vector3((float) picker_->color().red() / 255.f,
+                                     (float) picker_->color().green() / 255.f,
+                                     (float) picker_->color().blue() / 255.f);
+
+    fractal->setMaterial(
+            CGCP::material::Material(
+                    ui->roughnessSpinBox->value(),
+                    ui->metallicSpinBox->value(),
+                    color));
+
     auto args = CGCP::drawer::DrawingArgs{
             engine_->camera().get("main"),
             lights,
             fractal,
-            {(float) color.red() / 255.f,
-             (float) color.green() / 255.f,
-             (float) color.blue() / 255.f},
             ui->approximateFractal->isChecked(),
             (float) ui->alphaSpinBox->value()};
 

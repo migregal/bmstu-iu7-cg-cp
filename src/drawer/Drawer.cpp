@@ -50,7 +50,7 @@ namespace CGCP::drawer {
                                         1.0f),
                              32.0);
         } else {
-            color = color_;
+            color = fractal_->getColor();
             // color = mix(color, {0.10, 0.20, 0.30}, std::clamp(tra.y(), 0.0f, 1.0f));
             // color = mix(color, {0.02, 0.30, 0.10}, std::clamp(tra.z() * tra.z(), 0.0f, 1.0f));
             // color = mix(color, {0.30, 0.10, 0.02}, std::clamp(pow(tra.w(), 6.0), 0.0, 1.0));
@@ -76,8 +76,6 @@ namespace CGCP::drawer {
             const math::Vector3 &view,
             float fov,
             math::Vector3 const &c) {
-        auto specular = 1000;
-
         if (!lights_) return 0.0;
 
         double intensity = 0;
@@ -107,15 +105,18 @@ namespace CGCP::drawer {
             // diffuse refovction
             double n_dot_l = math::Vector3::dotProduct(normal, vec_l);
             if (n_dot_l > 0)
-                intensity += light->getIntensity() * n_dot_l /
+                intensity += fractal_->getRoughness() *
+                             light->getIntensity() * n_dot_l /
                              (length_n * vec_l.length());
 
             // specular refovction
-            auto vec_r = normal * (2.f * math::Vector3::dotProduct(normal, vec_l)) - vec_l;
+            auto vec_r = normal * (2.f * n_dot_l) - vec_l;
             double r_dot_v = math::Vector3::dotProduct(vec_r, view);
-            if (r_dot_v > 0)
+            if (r_dot_v > 0) {
                 intensity += light->getIntensity() *
-                             std::pow(r_dot_v / (vec_r.length() * length_v), specular);
+                             std::pow(r_dot_v / (vec_r.length() * length_v),
+                                      1 + 99 * (1 - fractal_->getSpecular()));
+            }
         }
 
         return intensity;

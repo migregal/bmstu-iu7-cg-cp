@@ -5,9 +5,11 @@
 
 #include <bounders/Bounder.h>
 
+#include <material/Material.h>
 #include <math/Vector.h>
 
 namespace CGCP::fractal {
+
     class Fractal {
     public:
         Fractal() = default;
@@ -28,7 +30,18 @@ namespace CGCP::fractal {
 
         void setBounder(std::shared_ptr<bounder::Bounder> bounder);
 
+        void setMaterial(const material::Material &material);
+
+        math::Vector3 &getColor();
+
+        double getRoughness();
+
+        double getSpecular();
+
     protected:
         std::shared_ptr<bounder::Bounder> bounder_;
+
+    private:
+        material::Material material_;
     };
 }// namespace CGCP::fractal
