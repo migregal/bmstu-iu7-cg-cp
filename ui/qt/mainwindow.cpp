@@ -169,15 +169,20 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
     auto rcontent = ui->graphicsView->contentsRect();
     scene_->setSceneRect(0, 0, rcontent.width(), rcontent.height());
 
-    dialog_->reset();
-    dialog_->show();
-
     auto lights = std::make_shared<CGCP::drawer::LightsList>();
     for (const auto &key : engine_->light().getKeys()) {
         lights->push_back(engine_->light().get(key));
     }
     auto fractal = engine_->fractal().get(
             ui->fractalComboBox->currentText().toStdString());
+
+    if (ui->bottom_x->value() > ui->upper_x->value() ||
+        ui->bottom_y->value() > ui->upper_y->value() ||
+        ui->bottom_z->value() > ui->upper_z->value()) {
+        QMessageBox::warning(this, "Внимание", "Введены некорректные даные для диапазона построения поверхности");
+        return;
+    }
+
     fractal->setBounder(std::shared_ptr<CGCP::bounder::Bounder>(
             new CGCP::bounder::AABB(
                     {(float) ui->bottom_x->value(), (float) ui->bottom_y->value(), (float) ui->bottom_z->value()},
@@ -199,6 +204,9 @@ void MainWindow::update_scene(std::function<void()> cancel_callback) {
             fractal,
             ui->approximateFractal->isChecked(),
             (float) ui->alphaSpinBox->value()};
+
+    dialog_->reset();
+    dialog_->show();
 
     engine_->drawer().get("main")->setFractal(
             args,

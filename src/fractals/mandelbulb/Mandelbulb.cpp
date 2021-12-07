@@ -48,7 +48,7 @@ namespace CGCP::fractal {
         float dz = 1.0;
 
         for (int i = 0; i < 4; i++) {
-#if 0
+#if 1
             // polynomial version (no trigonometrics, but MUCH slower)
             float m2 = m * m;
             float m4 = m2 * m2;

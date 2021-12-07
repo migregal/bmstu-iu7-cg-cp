@@ -22,14 +22,20 @@ namespace CGCP::drawer {
         return I - 2.0 * math::Vector3::dotProduct(N, I) * N;
     }
 
-    math::Vector3 Drawer::render(math::Vector2 const &pos, math::Matrix4x4 const &cam) {
-        const float fov = 1.5;
-
+    static inline math::Vector3 getCC(double alpha_) {
         auto cc = math::Vector3(0.9 * cos(3.9 + 1.2 * alpha_) - .3,
                                 0.8 * cos(2.5 + 1.1 * alpha_),
                                 0.8 * cos(3.4 + 1.3 * alpha_));
         if (cc.length() < 0.50) cc = 0.50 * cc.normalized();
         if (cc.length() > 0.95) cc = 0.95 * cc.normalized();
+
+        return cc;
+    }
+
+    math::Vector3 Drawer::render(math::Vector2 const &pos, math::Matrix4x4 const &cam) {
+        const float fov = 1.5;
+
+        auto cc = getCC(alpha_);
 
         QVector2D sp = getScreenPos(pos);
 
@@ -89,11 +95,10 @@ namespace CGCP::drawer {
             }
 
             auto vec_l = math::Vector3();
-            double t_max;
+            double t_max = 1.0;
 
             if (light->getType() == light::LightType::Point) {
                 vec_l = light->getPosition() - point;
-                t_max = 1.0;
             } else {
                 vec_l = light->getPosition();
                 t_max = std::numeric_limits<double>::max();
@@ -102,14 +107,14 @@ namespace CGCP::drawer {
             math::Vector4 tra;
             if (fractal_->raycast(point, vec_l, tra, fov, c) > 0) continue;
 
-            // diffuse refovction
+            // diffuse reflection
             double n_dot_l = math::Vector3::dotProduct(normal, vec_l);
             if (n_dot_l > 0)
                 intensity += fractal_->getRoughness() *
                              light->getIntensity() * n_dot_l /
                              (length_n * vec_l.length());
 
-            // specular refovction
+            // specular reflection
             auto vec_r = normal * (2.f * n_dot_l) - vec_l;
             double r_dot_v = math::Vector3::dotProduct(vec_r, view);
             if (r_dot_v > 0) {

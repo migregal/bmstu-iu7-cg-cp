@@ -955,6 +955,25 @@
   <tabstop>metallicSpinBox</tabstop>
   <tabstop>approximateFractal</tabstop>
   <tabstop>buildImageButton</tabstop>
+  <tabstop>rotationX</tabstop>
+  <tabstop>rotationY</tabstop>
+  <tabstop>rotationZ</tabstop>
+  <tabstop>rotationAlpha</tabstop>
+  <tabstop>rotationApply</tabstop>
+  <tabstop>translationX</tabstop>
+  <tabstop>translationY</tabstop>
+  <tabstop>translationZ</tabstop>
+  <tabstop>translationApply</tabstop>
+  <tabstop>ambientLightIntensity</tabstop>
+  <tabstop>directedLightIntensity</tabstop>
+  <tabstop>directedLightX</tabstop>
+  <tabstop>directedLightY</tabstop>
+  <tabstop>directedLightZ</tabstop>
+  <tabstop>positionedLightIntensity</tabstop>
+  <tabstop>positionedLightX</tabstop>
+  <tabstop>positionedLightY</tabstop>
+  <tabstop>positionedLightZ</tabstop>
+  <tabstop>applyLightButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

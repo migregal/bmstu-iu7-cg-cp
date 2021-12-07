@@ -6,6 +6,9 @@
 #include <math/Vector.h>
 
 #include <QDebug>
+
+#define MAX_RAYCAST_STEP 128
+
 namespace CGCP::fractal {
 
     float JuliaParametrized::raycast(
@@ -26,13 +29,13 @@ namespace CGCP::fractal {
 
         float fovfactor = 1.0 / sqrt(1.0 + fov * fov);
         float t = dis.x();
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < MAX_RAYCAST_STEP; i++) {
             auto pos = ro + rd * t;
-            float surface = std::clamp(0.001f * t * fovfactor, 0.0001f, 0.1f);
+            float surface = std::clamp(1e-3f * t * fovfactor, 1e-4f, 0.1f);
 
             float dt = map(pos, c, trap);
             if (t > dis.y() || dt < surface) break;
-            t += std::min(dt, 0.05f);
+            t += std::min(dt, 5e-2f);
         }
 
         if (t < dis.y()) {
@@ -48,7 +51,7 @@ namespace CGCP::fractal {
                                                 float fovfactor,
                                                 const math::Vector3 &c) {
         math::Vector4 tmp;
-        float surface = std::clamp(0.0005f * t * fovfactor, 0.0f, 0.1f);
+        float surface = std::clamp(5e-4f * t * fovfactor, 0.0f, 0.1f);
         auto eps = math::Vector2(surface, 0.0);
         auto e_xyy = math::Vector3(eps.x(), eps.y(), eps.y()),
              e_yyx = math::Vector3(eps.y(), eps.y(), eps.x()),
