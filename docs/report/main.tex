@@ -1,0 +1,41 @@
+\documentclass{bmstu}
+
+\include{preamble.inc}
+
+\begin{document}
+
+% \listingfile{main.py}{python}{Пример листинга}{}
+
+\makecourseworktitle{Информатика и системы управления}{Программное обеспечение ЭВМ и информационные технологии}{Разработка программного обеспечения для визуализации трехмерных
+фрактальных поверхностей}{ИУ7-53Б}{Г.~А.~Миронов}{А.~А.~Оленев}{}{}
+
+\setcounter{page}{3}
+
+\maketableofcontents
+
+\begin{definitions}
+	\definition{Axis Aligned Bounding Box}{параллелипипед, выравненный по координатным осям}
+	\definition{Поле расстояний со знаком}{это функция, получающая на входе точку и возвращающая кратчайшее расстояние от этой точки до поверхности каждого объекта в сцене. Кроме того, поле расстояний со знаком дополнительно возвращает отрицательное число, если точка находится внутри объекта.}
+\end{definitions}
+
+\begin{abbreviations}
+    \definition{ПО}{Программное обеспечение}
+    \definition{AABB}{Axis Aligned Bounding Box}
+    \definition{SDF}{Поле расстояний со знаком}
+\end{abbreviations}
+
+\include{00-intro}
+\include{10-analysis}
+\include{20-design}
+\include{30-impl}
+\include{40-research}
+\include{50-conclusion}
+
+\makebibliography
+
+% \begin{appendices}
+% 	\chapter{Первое приложение}
+% 	Текст приложения.
+% \end{appendices}
+
+\end{document}
